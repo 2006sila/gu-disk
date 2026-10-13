@@ -1,1 +1,0 @@
-find . -type f \( -name "*.cs" -o -name "*.html" -o -name "*.md" \) -exec sed -i "s/PSBH55250301830/SN2400000000000A/g; s/psbh55250301830/sn2400000000000a/g; s/YMB51T0RA2511512D3/YM2400000000000B/g; s/PSBH55250301831/SN2400000000000B/g" {} +
