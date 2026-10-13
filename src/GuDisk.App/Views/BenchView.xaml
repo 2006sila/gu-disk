@@ -1,0 +1,199 @@
+<UserControl x:Class="GuDisk.App.Views.BenchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel>
+
+      <!-- ============ 参数（照 CDM：一行几个下拉就够） ============ -->
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="0,0,14,0">
+              <TextBlock Text="档位" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="ProfileBox" Width="150" Height="30" Margin="0,4,0,0">
+                <ComboBoxItem Content="CDM 四档（默认）" IsSelected="True"/>
+                <ComboBoxItem Content="ATTO 阶梯 4K→16M"/>
+                <ComboBoxItem Content="随机访问 512B→1M"/>
+                <ComboBoxItem Content="快速（两档）"/>
+                <ComboBoxItem Content="自定义单档"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="0,0,14,0">
+              <TextBlock Text="运行次数（取最好）" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="RunsBox" Width="80" Height="30" Margin="0,4,0,0">
+                <ComboBoxItem Content="1"/><ComboBoxItem Content="3"/>
+                <ComboBoxItem Content="5" IsSelected="True"/><ComboBoxItem Content="9"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="0,0,14,0">
+              <TextBlock Text="测试规模" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="SizeBox" Width="90" Height="30" Margin="0,4,0,0">
+                <ComboBoxItem Content="256M"/><ComboBoxItem Content="512M"/>
+                <ComboBoxItem Content="1G" IsSelected="True"/><ComboBoxItem Content="2G"/>
+                <ComboBoxItem Content="4G"/><ComboBoxItem Content="8G"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="0,0,14,0">
+              <TextBlock Text="显示的指标" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="UnitBox" Width="130" Height="30" Margin="0,4,0,0"
+                        SelectionChanged="OnUnitChanged">
+                <ComboBoxItem Content="吞吐量（MB/s）" IsSelected="True"/>
+                <ComboBoxItem Content="IOPS"/>
+                <ComboBoxItem Content="平均延迟（ms）"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Bottom" Margin="0,0,0,4">
+              <StackPanel Orientation="Horizontal">
+                <Button x:Name="RunBtn" Style="{DynamicResource PrimaryButton}" Content="开始测速"
+                        Click="OnRun" ToolTip="与 CrystalDiskMark 的 All 同义：先读后写，跑完整个档位"/>
+                <Button x:Name="ReadOnlyBtn" Style="{DynamicResource QuietButton}" Content="只读"
+                        Margin="8,0,0,0" Click="OnRunReadOnly" ToolTip="不写盘，只测读取"/>
+                <Button x:Name="CancelBtn" Style="{DynamicResource QuietButton}" Content="中止"
+                        Margin="8,0,0,0" IsEnabled="False" Click="OnCancel"/>
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+
+          <TextBlock x:Name="TargetText" Margin="0,10,0,0" FontSize="11.5"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+
+          <!-- 高级选项：默认收起，需要时再展开 -->
+          <Expander x:Name="Advanced" Margin="0,8,0,0" Foreground="{DynamicResource Brush.Text2}">
+            <Expander.Header>
+              <TextBlock Text="高级选项（一般不用动）" FontSize="11.5"
+                         Foreground="{DynamicResource Brush.Text3}"/>
+            </Expander.Header>
+            <StackPanel Margin="0,8,0,0">
+              <WrapPanel>
+                <StackPanel Margin="0,0,16,8">
+                  <TextBlock Text="混合读写（写比例）" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+                  <ComboBox x:Name="MixBox" Width="140" Height="28" Margin="0,4,0,0">
+                    <ComboBoxItem Content="关闭（纯读 / 纯写）" IsSelected="True"/>
+                    <ComboBoxItem Content="写 10%"/><ComboBoxItem Content="写 30%"/>
+                    <ComboBoxItem Content="写 50%"/><ComboBoxItem Content="写 70%"/>
+                  </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,16,8">
+                  <TextBlock Text="跑够多少秒（0 = 按 I/O 量）" FontSize="11"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBox x:Name="DurationBox" Width="140" Height="28" Margin="0,4,0,0" Text="0"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,16,8">
+                  <TextBlock Text="自定义路径（留空 = 盘符根目录）" FontSize="11"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBox x:Name="PathBox" Width="260" Height="28" Margin="0,4,0,0"/>
+                </StackPanel>
+              </WrapPanel>
+              <TextBlock Text="自定义单档（档位选「自定义单档」时才用）" FontSize="11" Margin="0,2,0,6"
+                         Foreground="{DynamicResource Brush.Text3}"/>
+              <WrapPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6">
+                  <TextBlock Text="块大小" FontSize="11" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <ComboBox x:Name="BlockBox" Width="80" Height="28" Margin="6,0,0,0">
+                    <ComboBoxItem Content="4K"/><ComboBoxItem Content="8K"/><ComboBoxItem Content="16K"/>
+                    <ComboBoxItem Content="32K"/><ComboBoxItem Content="64K"/><ComboBoxItem Content="128K"/>
+                    <ComboBoxItem Content="256K"/><ComboBoxItem Content="512K"/>
+                    <ComboBoxItem Content="1M" IsSelected="True"/>
+                  </ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6">
+                  <TextBlock Text="队列" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBox x:Name="QdBox" Width="50" Height="28" Margin="6,0,0,0" Text="8"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,6">
+                  <TextBlock Text="线程" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBox x:Name="ThreadBox" Width="50" Height="28" Margin="6,0,0,0" Text="1"/>
+                </StackPanel>
+                <CheckBox x:Name="RandomBox" Content="随机块" Margin="0,0,16,6" VerticalAlignment="Center"
+                          Foreground="{DynamicResource Brush.Text2}"/>
+              </WrapPanel>
+            </StackPanel>
+          </Expander>
+        </StackPanel>
+      </Border>
+
+      <!-- ============ 进度 + 实时速率（合并成一张卡，省掉一块空白） ============ -->
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <Grid>
+            <TextBlock x:Name="PhaseText" FontSize="12" Foreground="{DynamicResource Brush.Text1}"/>
+            <TextBlock x:Name="EtaText" FontSize="11.5" HorizontalAlignment="Right"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+          </Grid>
+          <ProgressBar x:Name="Bar" Height="4" Margin="0,8,0,0" Minimum="0" Maximum="100"/>
+          <Grid Margin="0,12,0,0">
+            <TextBlock Style="{DynamicResource MicroLabel}" Text="速率曲线（已折叠空转段）"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <TextBlock x:Name="CpuText" Style="{DynamicResource MicroLabel}"/>
+              <TextBlock x:Name="WaveInfo" Style="{DynamicResource MicroLabel}" Margin="14,0,0,0"/>
+            </StackPanel>
+          </Grid>
+          <Canvas x:Name="WaveCanvas" Height="90" Margin="0,8,0,0" ClipToBounds="True">
+            <Border Background="{DynamicResource Brush.Surface2}" CornerRadius="6"
+                    Width="{Binding ActualWidth, ElementName=WaveCanvas}"
+                    Height="{Binding ActualHeight, ElementName=WaveCanvas}"/>
+            <Polyline x:Name="WaveFill" StrokeThickness="0" Fill="{DynamicResource Brush.LimeDim}"/>
+            <Polyline x:Name="Wave" Stroke="{DynamicResource Brush.Lime}" StrokeThickness="1.6"/>
+          </Canvas>
+          <TextBlock x:Name="StatusText" Margin="0,10,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ============ 结果矩阵（照 CDM：一行一个档位，两列读数） ============ -->
+      <Border Style="{DynamicResource ModuleCard}">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="逐档结果"/>
+          <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="200"/>
+              <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="档位" FontSize="11"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+            <TextBlock x:Name="Col1Header" Grid.Column="1" Text="读取" FontSize="11"
+                       TextAlignment="Right" Foreground="{DynamicResource Brush.Text3}"/>
+            <TextBlock x:Name="Col2Header" Grid.Column="2" Text="写入" FontSize="11"
+                       TextAlignment="Right" Foreground="{DynamicResource Brush.Text3}"/>
+          </Grid>
+          <Border Margin="0,6,0,8" Height="1" Background="{DynamicResource Brush.Line}"/>
+          <ItemsControl x:Name="MatrixList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,0,0,2" Height="32">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="200"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="12.5"
+                             FontFamily="{DynamicResource Font.Mono}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text2}"/>
+                  <!-- 读取：左边一条按比例的长度条，右边数字；条形让四档之间一眼看出差距 -->
+                  <Grid Grid.Column="1">
+                    <Border Height="18" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Center"
+                            Width="{Binding W1}" Background="{Binding Bar1}"/>
+                    <TextBlock Text="{Binding V1}" FontSize="16" FontWeight="Bold" Margin="0,0,8,0"
+                               FontFamily="{DynamicResource Font.Mono}" TextAlignment="Right"
+                               VerticalAlignment="Center" Foreground="{Binding Brush1}"/>
+                  </Grid>
+                  <Grid Grid.Column="2">
+                    <Border Height="18" CornerRadius="3" HorizontalAlignment="Right" VerticalAlignment="Center"
+                            Width="{Binding W2}" Background="{Binding Bar2}"/>
+                    <TextBlock Text="{Binding V2}" FontSize="16" FontWeight="Bold" Margin="0,0,8,0"
+                               FontFamily="{DynamicResource Font.Mono}" TextAlignment="Right"
+                               VerticalAlignment="Center" Foreground="{Binding Brush2}"/>
+                  </Grid>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock x:Name="SummaryText" Margin="0,4,0,0" FontSize="11.5" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,134 @@
+<UserControl x:Class="GuDisk.App.Views.SelfTestView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+
+      <!-- 硬件自检 -->
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <Grid>
+            <TextBlock Style="{DynamicResource MicroLabel}" Text="硬件自检"/>
+            <TextBlock x:Name="EngineText" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+          </Grid>
+          <TextBlock x:Name="HintText" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"
+                     Text="短自检约 2 分钟，扩展自检可能数小时。自检在盘内部执行，不影响系统使用，但期间不要断电。"/>
+          <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+            <Button x:Name="ShortBtn" Style="{DynamicResource PrimaryButton}" Content="短自检" Click="OnShort"/>
+            <Button x:Name="ExtBtn" Style="{DynamicResource QuietButton}" Content="扩展自检" Margin="8,0,0,0" Click="OnExtended"/>
+            <Button x:Name="AbortBtn" Style="{DynamicResource QuietButton}" Content="中止自检" Margin="8,0,0,0" Click="OnAbort"/>
+            <Button x:Name="ElevateBtn" Style="{DynamicResource QuietButton}" Content="以管理员身份重启" Margin="8,0,0,0"
+                    Click="OnElevate" Visibility="Collapsed"/>
+            <Button x:Name="RefreshBtn" Style="{DynamicResource QuietButton}" Content="刷新日志" Margin="8,0,0,0" Click="OnRefresh"/>
+          </StackPanel>
+          <TextBlock x:Name="StatusText" Margin="0,10,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text2}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- 两条日志 -->
+      <Grid Margin="0,0,0,12">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Style="{DynamicResource ModuleCard}" Margin="0,0,6,0">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="240"/></Grid.RowDefinitions>
+            <TextBlock x:Name="SelfLogHeader" Grid.Row="0" Style="{DynamicResource MicroLabel}"
+                       Text="自检日志" Margin="0,0,0,10"/>
+            <ListView x:Name="SelfLogList" Grid.Row="1" BorderThickness="0" Background="Transparent"
+                      Foreground="{DynamicResource Brush.Text1}">
+              <ListView.View>
+                <GridView>
+                  <GridViewColumn Header="#" Width="36" DisplayMemberBinding="{Binding Number}"/>
+                  <GridViewColumn Header="类型" Width="70" DisplayMemberBinding="{Binding Type}"/>
+                  <GridViewColumn Header="状态" Width="150" DisplayMemberBinding="{Binding Status}"/>
+                  <GridViewColumn Header="剩余" Width="60">
+                    <GridViewColumn.CellTemplate><DataTemplate>
+                      <TextBlock Text="{Binding RemainingPercent, StringFormat={}{0}%}"
+                                 FontFamily="{DynamicResource Font.Mono}"/>
+                    </DataTemplate></GridViewColumn.CellTemplate>
+                  </GridViewColumn>
+                  <GridViewColumn Header="通电" Width="80">
+                    <GridViewColumn.CellTemplate><DataTemplate>
+                      <TextBlock Text="{Binding PowerOnHours, StringFormat=N0}"
+                                 FontFamily="{DynamicResource Font.Mono}"/>
+                    </DataTemplate></GridViewColumn.CellTemplate>
+                  </GridViewColumn>
+                </GridView>
+              </ListView.View>
+            </ListView>
+          </Grid>
+        </Border>
+
+        <Border Grid.Column="1" Style="{DynamicResource ModuleCard}" Margin="6,0,0,0">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="240"/></Grid.RowDefinitions>
+            <TextBlock x:Name="ErrLogHeader" Grid.Row="0" Style="{DynamicResource MicroLabel}"
+                       Text="错误日志" Margin="0,0,0,10"/>
+            <ListView x:Name="ErrLogList" Grid.Row="1" BorderThickness="0" Background="Transparent"
+                      Foreground="{DynamicResource Brush.Text1}">
+              <ListView.View>
+                <GridView>
+                  <GridViewColumn Header="#" Width="36" DisplayMemberBinding="{Binding Number}"/>
+                  <GridViewColumn Header="错误码" Width="90">
+                    <GridViewColumn.CellTemplate><DataTemplate>
+                      <TextBlock Text="{Binding ErrorCode, StringFormat=X}" FontFamily="{DynamicResource Font.Mono}"/>
+                    </DataTemplate></GridViewColumn.CellTemplate>
+                  </GridViewColumn>
+                  <GridViewColumn Header="LBA" Width="150">
+                    <GridViewColumn.CellTemplate><DataTemplate>
+                      <TextBlock Text="{Binding Lba}" FontFamily="{DynamicResource Font.Mono}"/>
+                    </DataTemplate></GridViewColumn.CellTemplate>
+                  </GridViewColumn>
+                  <GridViewColumn Header="不可纠正" Width="80" DisplayMemberBinding="{Binding Uncorrectable}"/>
+                </GridView>
+              </ListView.View>
+            </ListView>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- AAM / APM -->
+      <Border Style="{DynamicResource ModuleCard}">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="AAM / APM（机械盘调速降噪）"/>
+          <TextBlock x:Name="AamHint" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"
+                     Text="AAM 调噪音（0x80 最安静 → 0xFE 最快），APM 调功耗（0x01 最省电 → 0xFE 最高性能）。只有机械盘支持，且需要管理员权限。"/>
+          <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="72"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="AAM" VerticalAlignment="Center" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.Text1}"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+              <TextBlock x:Name="AamValue" VerticalAlignment="Center" FontFamily="{DynamicResource Font.Mono}"
+                         FontSize="14" Width="150" Foreground="{DynamicResource Brush.Lime}"/>
+              <Button Style="{DynamicResource QuietButton}" Content="最安静 0x80" Click="OnAamQuiet"/>
+              <Button Style="{DynamicResource QuietButton}" Content="厂商推荐" Margin="8,0,0,0" Click="OnAamRecommended"/>
+              <Button Style="{DynamicResource QuietButton}" Content="最快 0xFE" Margin="8,0,0,0" Click="OnAamFast"/>
+              <Button Style="{DynamicResource QuietButton}" Content="关闭 0x00" Margin="8,0,0,0" Click="OnAamOff"/>
+            </StackPanel>
+          </Grid>
+          <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="72"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="APM" VerticalAlignment="Center" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.Text1}"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+              <TextBlock x:Name="ApmValue" VerticalAlignment="Center" FontFamily="{DynamicResource Font.Mono}"
+                         FontSize="14" Width="150" Foreground="{DynamicResource Brush.Lime}"/>
+              <Button Style="{DynamicResource QuietButton}" Content="最省电 0x01" Click="OnApmLow"/>
+              <Button Style="{DynamicResource QuietButton}" Content="平衡 0x80" Margin="8,0,0,0" Click="OnApmMid"/>
+              <Button Style="{DynamicResource QuietButton}" Content="最高性能 0xFE" Margin="8,0,0,0" Click="OnApmHigh"/>
+              <Button Style="{DynamicResource QuietButton}" Content="关闭 0x00" Margin="8,0,0,0" Click="OnApmOff"/>
+            </StackPanel>
+          </Grid>
+          <TextBlock x:Name="AamStatus" Margin="0,10,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text2}"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

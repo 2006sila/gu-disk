@@ -1,0 +1,162 @@
+<Window x:Class="GuDisk.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:GuDisk.App.Views"
+        Title="Gu-disk · 磁盘全检"
+        Width="1280" Height="840" MinWidth="1050" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Bg}"
+        FontFamily="{DynamicResource Font.UI}"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display" Icon="pack://application:,,,/Assets/gudisk.ico">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="56"/>
+      <RowDefinition Height="44"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="58"/>
+    </Grid.RowDefinitions>
+
+    <!-- ===== 顶栏：品牌 + 设备芯片 + 操作 ===== -->
+    <Border Grid.Row="0" Background="{DynamicResource Brush.Surface}"
+            BorderBrush="{DynamicResource Brush.Line}" BorderThickness="0,0,0,1">
+      <Grid Margin="16,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+          <Border Width="22" Height="22" CornerRadius="6" BorderThickness="1.7"
+                  BorderBrush="{DynamicResource Brush.Lime}">
+            <Border Height="2" Width="10" Background="{DynamicResource Brush.Lime}"
+                    CornerRadius="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+          </Border>
+          <StackPanel Margin="9,0,0,0" VerticalAlignment="Center">
+            <TextBlock Text="Gu-disk" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text1}"/>
+            <TextBlock x:Name="VersionText" FontFamily="{DynamicResource Font.Mono}" FontSize="10"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+          </StackPanel>
+        </StackPanel>
+
+        <ListBox Grid.Column="1" ItemsSource="{Binding Drives}" SelectedItem="{Binding SelectedDrive}"
+                 Background="Transparent" BorderThickness="0" VerticalAlignment="Center"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Disabled">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="Bd" Background="{DynamicResource Brush.Surface2}"
+                            BorderBrush="{DynamicResource Brush.Line}" BorderThickness="1"
+                            CornerRadius="8" Height="40" Padding="14,0,10,0" Margin="0,0,9,0">
+                      <ContentPresenter VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsSelected" Value="True">
+                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.Surface3}"/>
+                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Brush.LimeLine}"/>
+                      </Trigger>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Brush.Surface3}"/>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel>
+                <TextBlock Text="{Binding Model}" FontSize="12.5" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text1}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock FontFamily="{DynamicResource Font.Mono}" FontSize="10"
+                           Foreground="{DynamicResource Brush.Text3}" TextTrimming="CharacterEllipsis">
+                  <Run Text="{Binding BusText, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding CapacityText, Mode=OneWay}"/>
+                </TextBlock>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+          <Border CornerRadius="99" BorderThickness="1" Padding="10,4" BorderBrush="{DynamicResource Brush.Line}">
+            <StackPanel Orientation="Horizontal">
+              <Ellipse x:Name="AdminDot" Width="6" Height="6" VerticalAlignment="Center"
+                       Fill="{DynamicResource Brush.Warn}"/>
+              <TextBlock x:Name="AdminText" Margin="6,0,0,0" FontSize="11" Foreground="{DynamicResource Brush.Text2}"/>
+            </StackPanel>
+          </Border>
+          <Button Style="{DynamicResource IconButton}" Content="◐" ToolTip="切换深浅主题" Click="OnToggleTheme"/>
+          <Button Style="{DynamicResource IconButton}" Content="↻" ToolTip="刷新当前盘" Command="{Binding RefreshCommand}"/>
+          <Button Style="{DynamicResource IconButton}" Content="⟳" ToolTip="重新扫描设备" Click="OnRescan"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ===== 页签条 ===== -->
+    <Border Grid.Row="1" Background="{DynamicResource Brush.Surface}"
+            BorderBrush="{DynamicResource Brush.Line}" BorderThickness="0,0,0,1">
+      <Grid Margin="16,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel x:Name="Tabs" Grid.Column="0" Orientation="Horizontal">
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="硬盘概览"
+                       Tag="overview" IsChecked="True" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="S.M.A.R.T."
+                       Tag="smart" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="自检与工具"
+                       Tag="selftest" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="基准测速"
+                       Tag="bench" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="坏道扫描"
+                       Tag="scan" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="诊断报告"
+                       Tag="report" Checked="OnTabChecked"/>
+          <RadioButton Style="{DynamicResource TabRadio}" GroupName="Nav" Content="设置"
+                       Tag="settings" Checked="OnTabChecked" Margin="0"/>
+        </StackPanel>
+        <TextBlock x:Name="EngineText" Grid.Column="1" VerticalAlignment="Center" FontSize="11.5"
+                   Foreground="{DynamicResource Brush.Text3}"/>
+      </Grid>
+    </Border>
+
+    <!-- ===== 主区 ===== -->
+    <Grid Grid.Row="2" Margin="16,14">
+      <v:OverviewView x:Name="OverviewPane"/>
+      <v:SmartView x:Name="SmartPane" Visibility="Collapsed"/>
+      <v:SelfTestView x:Name="SelfTestPane" Visibility="Collapsed"/>
+      <v:BenchView x:Name="BenchPane" Visibility="Collapsed"/>
+      <v:ScanView x:Name="ScanPane" Visibility="Collapsed"/>
+      <v:ReportView x:Name="ReportPane" Visibility="Collapsed"/>
+      <v:SettingsView x:Name="SettingsPane" Visibility="Collapsed"/>
+      <Border x:Name="PlaceholderPane" Style="{DynamicResource ModuleCard}" Visibility="Collapsed">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+          <TextBlock x:Name="PlaceholderTitle" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="PlaceholderBody" Margin="0,12,0,0" FontSize="14" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource Brush.Text1}"/>
+          <TextBlock x:Name="PlaceholderHint" Margin="0,8,0,0" FontSize="11.5" HorizontalAlignment="Center"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+        </StackPanel>
+      </Border>
+      <Border x:Name="BusyPane" Background="#80000000" Visibility="Collapsed">
+        <TextBlock Text="正在读取…" FontSize="15" Foreground="{DynamicResource Brush.Lime}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+    </Grid>
+
+    <!-- ===== 底部状态条 ===== -->
+    <Border Grid.Row="3" Background="{DynamicResource Brush.Surface}"
+            BorderBrush="{DynamicResource Brush.Line}" BorderThickness="0,1,0,0">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0">
+        <TextBlock Style="{DynamicResource MicroLabel}" Text="状态" VerticalAlignment="Center"/>
+        <TextBlock x:Name="StatusText" Margin="14,0,0,0" FontSize="12" VerticalAlignment="Center"
+                   Foreground="{DynamicResource Brush.Text2}" Text="{Binding StatusText}"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

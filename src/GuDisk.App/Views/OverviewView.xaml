@@ -1,0 +1,208 @@
+<UserControl x:Class="GuDisk.App.Views.OverviewView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <!-- 分析卡里的"键 → 值"行。**必须显式写模板**：不写的话 WPF 会退回 ToString()，
+         界面上就会出现 KvRow { Key = … } 这种原始记录转储。 -->
+    <DataTemplate x:Key="KvRowTemplate">
+      <Grid Margin="0,0,0,8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="{Binding Key}" FontSize="11.5" TextWrapping="Wrap"
+                   VerticalAlignment="Top" Foreground="{DynamicResource Brush.Text3}"/>
+        <TextBlock Grid.Column="1" Text="{Binding Value}" Margin="10,0,0,0" FontSize="11.5"
+                   FontFamily="{DynamicResource Font.Mono}" TextAlignment="Right" TextWrapping="Wrap"
+                   MaxWidth="150" Foreground="{DynamicResource Brush.Text1}"/>
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel>
+
+      <!-- ============ 设备头卡 ============ -->
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <Grid>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock x:Name="ModelText" FontSize="19" FontWeight="SemiBold" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Brush.Text1}"/>
+              <Border Style="{DynamicResource Chip}" Height="24" Padding="10,0" Margin="12,0,0,0">
+                <TextBlock x:Name="CapacityChip" FontFamily="{DynamicResource Font.Mono}" FontSize="11.5"
+                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text2}"/>
+              </Border>
+              <Border Style="{DynamicResource Chip}" Height="24" Padding="10,0" Margin="8,0,0,0">
+                <TextBlock x:Name="BusChip" FontFamily="{DynamicResource Font.Mono}" FontSize="11.5"
+                           VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text2}"/>
+              </Border>
+              <Border Style="{DynamicResource Chip}" Height="24" Padding="10,0" Margin="8,0,0,0">
+                <TextBlock x:Name="MediaChip" FontSize="11.5" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Brush.Text2}"/>
+              </Border>
+            </StackPanel>
+            <Border x:Name="StateBadgeBorder" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    CornerRadius="99" Padding="12,4">
+              <TextBlock x:Name="StateBadgeText" FontSize="12" FontWeight="Bold"/>
+            </Border>
+          </Grid>
+
+          <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="170"/>
+              <ColumnDefinition Width="170"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="总体状态"/>
+              <TextBlock x:Name="StateText" Margin="0,6,0,0" FontSize="30" FontWeight="Bold"
+                         Foreground="{DynamicResource Brush.Text1}"/>
+              <TextBlock x:Name="CountsText" Margin="0,4,0,0" FontSize="11.5" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Brush.Text3}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="温度"/>
+              <TextBlock x:Name="TempText" Margin="0,6,0,0" FontFamily="{DynamicResource Font.Mono}"
+                         FontSize="30" FontWeight="Bold" Foreground="{DynamicResource Brush.Lime}"/>
+              <TextBlock x:Name="TempAtText" Margin="0,4,0,0" FontSize="11.5"
+                         Foreground="{DynamicResource Brush.Text3}"/>
+            </StackPanel>
+
+            <ItemsControl x:Name="SpecGrid" Grid.Column="2">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid Margin="0,0,16,8">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="86"/>
+                      <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Key}" FontSize="11.5"
+                               Foreground="{DynamicResource Brush.Text3}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" FontSize="12"
+                               FontFamily="{DynamicResource Font.Mono}" TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource Brush.Text1}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+
+          <!-- 关键属性条 -->
+          <Border Margin="0,6,0,0" Padding="0,12,0,0" BorderThickness="0,1,0,0"
+                  BorderBrush="{DynamicResource Brush.Line}">
+            <ItemsControl x:Name="Ribbon">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Margin="0,0,8,6" Padding="10,6" CornerRadius="6"
+                          Background="{DynamicResource Brush.Surface2}"
+                          BorderBrush="{DynamicResource Brush.Line}" BorderThickness="1">
+                    <StackPanel Orientation="Horizontal">
+                      <Ellipse Width="6" Height="6" VerticalAlignment="Center" Fill="{Binding Dot}"/>
+                      <TextBlock Text="{Binding Key}" Margin="7,0,8,0" FontSize="11.5"
+                                 Foreground="{DynamicResource Brush.Text3}"/>
+                      <TextBlock Text="{Binding Value}" FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                                 FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text1}"/>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- ============ 四张分析卡 ============ -->
+      <UniformGrid Columns="4" Margin="0,0,0,12">
+        <Border Grid.Column="0" Style="{DynamicResource ModuleCard}" Margin="0,0,6,0">
+          <StackPanel>
+            <Grid>
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="坏道与介质"/>
+              <TextBlock x:Name="Card1Badge" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+            </Grid>
+            <ItemsControl x:Name="Card1" Margin="0,10,0,0" ItemTemplate="{StaticResource KvRowTemplate}"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Style="{DynamicResource ModuleCard}" Margin="6,0,6,0">
+          <StackPanel>
+            <Grid>
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="通信与接口"/>
+              <TextBlock x:Name="Card2Badge" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+            </Grid>
+            <ItemsControl x:Name="Card2" Margin="0,10,0,0" ItemTemplate="{StaticResource KvRowTemplate}"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Style="{DynamicResource ModuleCard}" Margin="6,0,6,0">
+          <StackPanel>
+            <Grid>
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="读写与负载"/>
+              <TextBlock x:Name="Card3Badge" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+            </Grid>
+            <ItemsControl x:Name="Card3" Margin="0,10,0,0" ItemTemplate="{StaticResource KvRowTemplate}"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="3" Style="{DynamicResource ModuleCard}" Margin="6,0,0,0">
+          <StackPanel>
+            <Grid>
+              <TextBlock Style="{DynamicResource MicroLabel}" Text="判定依据"/>
+              <TextBlock x:Name="Card4Badge" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+            </Grid>
+            <ItemsControl x:Name="Card4" Margin="0,10,0,0" ItemTemplate="{StaticResource KvRowTemplate}"/>
+          </StackPanel>
+        </Border>
+      </UniformGrid>
+
+      <!-- ============ 温度历史 ============ -->
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <Grid>
+            <TextBlock Style="{DynamicResource MicroLabel}" Text="温度历史（近 30 天）"/>
+            <TextBlock x:Name="TempHistInfo" Style="{DynamicResource MicroLabel}" HorizontalAlignment="Right"/>
+          </Grid>
+          <Canvas x:Name="TempHistCanvas" Height="110" Margin="0,8,0,0" ClipToBounds="True">
+            <Border Background="{DynamicResource Brush.Surface2}" CornerRadius="6"
+                    Width="{Binding ActualWidth, ElementName=TempHistCanvas}"
+                    Height="{Binding ActualHeight, ElementName=TempHistCanvas}"/>
+            <Polyline x:Name="TempHistFill" StrokeThickness="0" Fill="{DynamicResource Brush.LimeDim}"/>
+            <Polyline x:Name="TempHistLine" Stroke="{DynamicResource Brush.Lime}" StrokeThickness="1.6"/>
+          </Canvas>
+          <TextBlock x:Name="TempHistRange" Style="{DynamicResource MicroLabel}" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <!-- ============ 快速跳转 ============ -->
+      <Border Style="{DynamicResource ModuleCard}">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="快速跳转"/>
+          <ItemsControl x:Name="JumpList" Margin="0,10,0,0">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><UniformGrid Columns="5"/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Style="{DynamicResource JumpCard}" Tag="{Binding Tag}" Click="OnJump"
+                        ToolTip="{Binding Desc}">
+                  <StackPanel>
+                    <TextBlock Text="{Binding Title}" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Text1}"/>
+                    <TextBlock Text="{Binding Desc}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap"
+                               Foreground="{DynamicResource Brush.Text3}"/>
+                    <TextBlock Text="→" FontSize="13" Margin="0,6,0,0"
+                               Foreground="{DynamicResource Brush.Lime}"/>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

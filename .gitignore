@@ -1,0 +1,20 @@
+# ---- 构建产物 ----
+dist/
+verify-report.md
+bin/
+obj/
+dist/publish/
+*.user
+
+# ---- 本地工具链缓存（沙箱内 dotnet / nuget 必须指向工作区）----
+.dotnet/
+.nuget/
+
+# ---- 渲染 / 调试临时 ----
+.edge-*/
+*.tmp
+
+# ---- 参照素材：由 tools/extract-reference.mjs 再生，不入库 ----
+reference/extracted/
+tools/smartctl/*.exe
+tools/smartctl/drivedb.h

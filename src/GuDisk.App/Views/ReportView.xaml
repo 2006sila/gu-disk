@@ -1,0 +1,58 @@
+<UserControl x:Class="GuDisk.App.Views.ReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Border Grid.Row="0" Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+      <StackPanel>
+        <TextBlock Style="{DynamicResource MicroLabel}" Text="导出诊断报告"/>
+        <WrapPanel Margin="0,10,0,0">
+          <StackPanel Margin="0,0,18,8">
+            <TextBlock Text="格式" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+            <ComboBox x:Name="FormatBox" Width="200" Height="30" Margin="0,4,0,0"
+                      Background="{DynamicResource Brush.Surface2}" Foreground="{DynamicResource Brush.Text1}"
+                      BorderBrush="{DynamicResource Brush.Line}">
+              <ComboBoxItem Content="HTML（自包含单文件）" IsSelected="True"/>
+              <ComboBoxItem Content="TXT（纯文本）"/>
+              <ComboBoxItem Content="JSON（原始数据）"/>
+            </ComboBox>
+          </StackPanel>
+          <StackPanel Margin="0,0,18,8">
+            <TextBlock Text="附加内容" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
+              <CheckBox x:Name="BenchBox" Content="包含测速（256M）" Foreground="{DynamicResource Brush.Text2}"/>
+              <CheckBox x:Name="ScanBox" Content="包含坏道扫描（1G）" Margin="14,0,0,0"
+                        Foreground="{DynamicResource Brush.Text2}"/>
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,22,0,8">
+            <Button x:Name="GenBtn" Style="{DynamicResource PrimaryButton}" Content="生成报告" Click="OnGenerate"/>
+            <Button x:Name="OpenBtn" Style="{DynamicResource QuietButton}" Content="打开所在文件夹" Margin="8,0,0,0"
+                    Click="OnOpenFolder" IsEnabled="False"/>
+            <Button x:Name="CopyBtn" Style="{DynamicResource QuietButton}" Content="复制到剪贴板" Margin="8,0,0,0"
+                    Click="OnCopy" IsEnabled="False"/>
+          </StackPanel>
+        </WrapPanel>
+        <TextBlock x:Name="StatusText" Margin="0,6,0,0" FontSize="12"
+                   Foreground="{DynamicResource Brush.Text3}"/>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="1" Style="{DynamicResource ModuleCard}">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock x:Name="PreviewHeader" Grid.Row="0" Style="{DynamicResource MicroLabel}"
+                   Text="报告预览（TXT 格式前 200 行）" Margin="0,0,0,10"/>
+        <TextBox x:Name="Preview" Grid.Row="1" IsReadOnly="True" AcceptsReturn="True"
+                 TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                 FontFamily="{DynamicResource Font.Mono}" FontSize="11.5"
+                 Background="{DynamicResource Brush.Surface2}" Foreground="{DynamicResource Brush.Text2}"
+                 BorderBrush="{DynamicResource Brush.Line}" Padding="10"/>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

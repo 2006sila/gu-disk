@@ -1,0 +1,17 @@
+<Application x:Class="GuDisk.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="Views/MainWindow.xaml">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- [0] 颜色令牌：主题切换时整本替换（只换这一本，样式必须留着）。
+             早先把三本合成 Theme.xaml 再按索引 [0] 替换 —— 换掉的是整本 Theme.xaml，
+             样式全丢，浅色下页签变回系统单选圆圈、按钮变回 3D 边框。 -->
+        <ResourceDictionary Source="Themes/Tokens.Dark.xaml"/>
+        <ResourceDictionary Source="Themes/Metrics.xaml"/>
+        <ResourceDictionary Source="Themes/Styles.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

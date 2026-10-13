@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<title>Gu-disk 外观稿 v2 · 硬盘概览</title><link rel="stylesheet" href="gu-disk.css"></head><body>
+
+<div class="top">
+  <div class="logo"><svg class="logo-mark" viewBox="0 0 24 24" fill="none">
+  <rect x="2.5" y="3.5" width="19" height="17" rx="4" stroke="var(--lime)" stroke-width="1.7"/>
+  <path d="M7 9.5h10M7 13h6" stroke="var(--lime)" stroke-width="1.7" stroke-linecap="round" opacity=".55"/>
+  <circle cx="17.5" cy="16.5" r="2" fill="var(--lime)"/></svg><div><div class="logo-txt">Gu-disk</div><div class="logo-ver">v0.1.0 · 本地引擎</div></div></div>
+  <div class="chips"><div class="chip on">
+  <div class="m">Predator SSD GM7 2TB</div><div class="s">C: · NVMe · 1.82 TB · 40℃</div></div><div class="chip">
+  <div class="m">KIOXIA EXCERIA PLUS G3</div><div class="s">D: · NVMe · 931 GB · 40℃</div></div><div class="chip">
+  <div class="m">YMTC YMSS2E</div><div class="s">E: · NVMe · 953 GB · 38℃</div></div><div class="chip w">
+  <div class="m">USB 硬盘盒（RTL9210）</div><div class="s">F: · USB · 1.0 TB · 未透传</div></div></div>
+  <div class="tools">
+    <div class="admin"><i></i>管理员 · 直通可用</div>
+    <div class="ico-btn">◐</div><div class="ico-btn">↻</div><div class="ico-btn">⟳</div>
+  </div>
+</div>
+
+<div class="tabs"><div class="tab on">硬盘概览</div><div class="tab">S.M.A.R.T.</div><div class="tab">硬件规格</div><div class="tab">基准测速</div><div class="tab">坏道扫描</div><div class="tab">历史趋势</div><div class="tab">自检与日志</div><div class="tab">诊断报告</div><div class="tab">设置</div>
+  <div class="right">
+    <span>原生引擎 <b style="color:var(--ok)">已用</b></span>
+    <span style="color:var(--line2)">|</span>
+    <span>smartctl 校验 <b style="color:var(--ok)">一致</b></span>
+    <span style="color:var(--line2)">|</span>
+    <span class="mono">drivedb 索引 v1</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="hero">
+    <div>
+      <div class="lb hero-id">健康评分</div>
+      <div class="scorebox"><span class="score">100</span><span class="score-u">/ 100</span><span class="grade">优秀</span></div>
+      <div class="ticks"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div>
+      <div class="lb">Predator SSD GM7 2TB</div>
+    </div>
+    <div>
+      <div class="lb" style="margin-bottom:10px">评估维度 · 扣分明细</div>
+      <div class="dims">
+        <div class="dim"><span class="k">可靠性</span><span class="bar"><span style="width:100%"></span></span><span class="v">60/60</span></div>
+        <div class="dim"><span class="k">寿命</span><span class="bar"><span style="width:100%"></span></span><span class="v">25/25</span></div>
+        <div class="dim"><span class="k">环境</span><span class="bar"><span style="width:100%"></span></span><span class="v">15/15</span></div>
+      </div>
+      <div style="margin-top:13px;font-size:11.5px;color:var(--t3);line-height:1.6">
+        未发现坏道、介质错误与接口校验错误；温度长期稳定在 38–44 ℃；未启用写入寿命预测（型号 TBW 未知）。
+      </div>
+    </div>
+    <div class="quick">
+      <div class="q"><span class="l">综合温度</span><span><span class="n" style="color:var(--ok)">40</span><span class="u">℃</span></span></div>
+      <div class="q"><span class="l">已用寿命</span><span><span class="n">0</span><span class="u">%</span></span></div>
+      <div class="q"><span class="l">通电时长</span><span><span class="n">207</span><span class="u">h</span></span></div>
+      <div class="q"><span class="l">启停次数</span><span><span class="n">1 012</span><span class="u">次</span></span></div>
+    </div>
+    <div class="verdict">
+      <span class="tag ok">结论</span>
+      <span><b>介质完好，可以正常使用。</b>全部 34 项属性无异常，SMART 自检整体判定为通过。</span>
+      <span class="tag n" style="margin-left:auto">NVMe Health Log</span>
+      <span class="tag n">PCIe 4.0 x4</span>
+    </div>
+  </div>
+
+  <div class="mods">
+    <div class="mod">
+      <div class="mod-h"><span class="t">身份与固件</span></div>
+      <dl class="kv">
+        <dt>序列号</dt><dd>SN2400000000000A</dd>
+        <dt>固件</dt><dd>SN11712</dd>
+        <dt>接口</dt><dd>NVM Express</dd>
+        <dt>标准</dt><dd>NVMe 2.0</dd>
+        <dt>传输模式</dt><dd>PCIe 4.0 x4</dd>
+        <dt>扇区</dt><dd>512 B</dd>
+        <dt>挂载</dt><dd>C: （系统盘）</dd>
+      </dl>
+    </div>
+
+    <div class="mod">
+      <div class="mod-h"><span class="t">关键风险指标</span><span class="a">7 项全部正常</span></div>
+      <div class="risk"><span class="id">05</span><span class="nm">重新分配扇区</span><span class="val">0</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">C5</span><span class="nm">待映射扇区</span><span class="val">0</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">C6</span><span class="nm">不可校正错误</span><span class="val">0</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">C7</span><span class="nm">接口 CRC 错误</span><span class="val">0</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">0E</span><span class="nm">介质与数据完整性错误</span><span class="val">0</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">03</span><span class="nm">可用备用空间</span><span class="val">100 %</span><span class="tag ok">正常</span></div>
+      <div class="risk"><span class="id">05</span><span class="nm">已用寿命百分比</span><span class="val">0 %</span><span class="tag ok">正常</span></div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-h"><span class="t">介质与链路</span></div>
+      <dl class="kv">
+        <dt>介质类型</dt><dd>SSD（NVMe）</dd>
+        <dt>主控</dt><dd>Maxio MAP1602</dd>
+        <dt>链路速率</dt><dd>16 GT/s x4</dd>
+        <dt>协商速率</dt><dd>PCIe 4.0 x4</dd>
+        <dt>读写单位</dt><dd>512 000 B</dd>
+        <dt>特性</dt><dd>SMART · 自检 · TRIM</dd>
+        <dt>桥接</dt><dd>— （直连）</dd>
+      </dl>
+    </div>
+
+    <div class="mod" style="grid-column:span 2">
+      <div class="mod-h"><span class="t">温度趋势 · 最近 24 小时</span><span class="a mono">最低 38 ℃ · 最高 44 ℃ · 平均 40.2 ℃</span></div>
+      <div class="spark">
+        <svg viewBox="0 0 620 118" preserveAspectRatio="none" style="width:100%;height:100%">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="var(--lime)" stop-opacity=".26"/>
+            <stop offset="1" stop-color="var(--lime)" stop-opacity="0"/></linearGradient></defs>
+          <line x1="6" y1="96.9" x2="614" y2="96.9" stroke="var(--line)" stroke-dasharray="3 5"/>
+  <text x="2" y="100.4" font-size="9" fill="var(--t3)" font-family="var(--mono)">36</text><line x1="6" y1="66.6" x2="614" y2="66.6" stroke="var(--line)" stroke-dasharray="3 5"/>
+  <text x="2" y="70.1" font-size="9" fill="var(--t3)" font-family="var(--mono)">40</text><line x1="6" y1="36.3" x2="614" y2="36.3" stroke="var(--line)" stroke-dasharray="3 5"/>
+  <text x="2" y="39.8" font-size="9" fill="var(--t3)" font-family="var(--mono)">44</text><line x1="6" y1="6.0" x2="614" y2="6.0" stroke="var(--line)" stroke-dasharray="3 5"/>
+  <text x="2" y="9.5" font-size="9" fill="var(--t3)" font-family="var(--mono)">48</text>
+          <polygon points="6,118 6.0,74.1 32.4,74.1 58.9,81.7 85.3,81.7 111.7,81.7 138.2,74.1 164.6,59.0 191.0,43.9 217.5,36.3 243.9,51.4 270.3,66.6 296.8,74.1 323.2,81.7 349.7,81.7 376.1,74.1 402.5,66.6 429.0,51.4 455.4,43.9 481.8,59.0 508.3,66.6 534.7,74.1 561.1,81.7 587.6,74.1 614.0,66.6 614,118" fill="url(#g1)"/>
+          <polyline points="6.0,74.1 32.4,74.1 58.9,81.7 85.3,81.7 111.7,81.7 138.2,74.1 164.6,59.0 191.0,43.9 217.5,36.3 243.9,51.4 270.3,66.6 296.8,74.1 323.2,81.7 349.7,81.7 376.1,74.1 402.5,66.6 429.0,51.4 455.4,43.9 481.8,59.0 508.3,66.6 534.7,74.1 561.1,81.7 587.6,74.1 614.0,66.6" fill="none" stroke="var(--lime)" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="614.0" cy="66.6" r="3" fill="var(--lime)"/>
+        </svg>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--t3);padding-left:14px">
+        <span class="mono">-24h</span><span class="mono">-18h</span><span class="mono">-12h</span><span class="mono">-6h</span><span class="mono">现在</span>
+      </div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-h"><span class="t">读写负载与寿命</span></div>
+      <div class="bars">
+        <div class="bline"><div class="bt"><span class="k">主机总计读取</span><span class="v" style="color:var(--blue)">12.0 TB</span></div>
+          <div class="btrack"><span style="width:100%;background:var(--blue)"></span></div></div>
+        <div class="bline"><div class="bt"><span class="k">主机总计写入</span><span class="v" style="color:var(--lime)">5.5 TB</span></div>
+          <div class="btrack"><span style="width:46%;background:var(--lime)"></span></div></div>
+        <div class="bline"><div class="bt"><span class="k">已用寿命百分比</span><span class="v">0 %</span></div>
+          <div class="btrack"><span style="width:1%;background:var(--ok)"></span></div></div>
+      </div>
+      <div class="foot-note">累计通电 207 小时 · 1012 次启停 · 3 次不安全关机</div>
+    </div>
+  </div>
+</div>
+
+<div class="dock">
+  <span class="lb2">任务台</span>
+  <div class="task">
+    <span class="nm2">基准测速 · SEQ1M Q8T1</span>
+    <span class="track"><span style="width:68%"></span></span>
+    <span class="pct">68%</span>
+    <span class="meta">1.81 GB/s · 剩 00:41</span>
+    <span class="btn2">❙❙</span><span class="btn2">✕</span>
+  </div>
+  <span class="meta mono" style="color:var(--t3)">队列 8 · 1 GiB · 第 2/4 次</span>
+  <span class="sp"></span>
+  <span style="font-size:11.5px;color:var(--t3)">测速 / 扫描 / 自检会在这里排队，关闭窗口也会继续</span>
+</div>
+
+</body></html>

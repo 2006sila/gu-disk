@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<title>Gu-disk 外观稿 v2 · S.M.A.R.T.</title><link rel="stylesheet" href="gu-disk.css"></head><body>
+<div class="top">
+  <div class="logo"><svg class="logo-mark" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="3.5" width="19" height="17" rx="4" stroke="var(--lime)" stroke-width="1.7"/><path d="M7 9.5h10M7 13h6" stroke="var(--lime)" stroke-width="1.7" stroke-linecap="round" opacity=".55"/><circle cx="17.5" cy="16.5" r="2" fill="var(--lime)"/></svg><div><div class="logo-txt">Gu-disk</div><div class="logo-ver">v0.1.0 · 本地引擎</div></div></div>
+  <div class="chips"><div class="chip on"><div class="m">Predator SSD GM7 2TB</div><div class="s">C: · NVMe · 1.82 TB · 40℃</div></div><div class="chip"><div class="m">KIOXIA EXCERIA PLUS G3</div><div class="s">D: · NVMe · 931 GB · 40℃</div></div><div class="chip"><div class="m">YMTC YMSS2E</div><div class="s">E: · NVMe · 953 GB · 38℃</div></div><div class="chip w"><div class="m">USB 硬盘盒（RTL9210）</div><div class="s">F: · USB · 1.0 TB · 未透传</div></div></div>
+  <div class="tools"><div class="admin"><i></i>管理员 · 直通可用</div>
+    <div class="ico-btn">◐</div><div class="ico-btn">↻</div><div class="ico-btn">⟳</div></div>
+</div>
+<div class="tabs"><div class="tab">硬盘概览</div><div class="tab on">S.M.A.R.T.</div><div class="tab">硬件规格</div><div class="tab">基准测速</div><div class="tab">坏道扫描</div><div class="tab">历史趋势</div><div class="tab">自检与日志</div><div class="tab">诊断报告</div><div class="tab">设置</div>
+  <div class="right"><span>原生引擎 <b style="color:var(--ok)">已用</b></span>
+    <span style="color:var(--line2)">|</span><span>smartctl 校验 <b style="color:var(--ok)">一致</b></span>
+    <span style="color:var(--line2)">|</span><span class="mono">drivedb 索引 v1</span></div>
+</div>
+<div class="main">
+  <div class="toolbar">
+    <input class="search" placeholder="搜索 ID / 中文名 / 英文名…">
+    <div class="seg"><div class="on">全部 21</div><div>关键 6</div><div>异常 0</div><div>统计 5</div></div>
+    <span class="lb">排序</span><span class="mono" style="font-size:12px;color:var(--t1)">按 ID ▾</span>
+    <span style="margin-left:auto;font-size:11.5px;color:var(--t3)">读取自 NVMe SMART / Health Log · 512 B · 耗时 23 ms</span>
+    <span class="tag ok">双引擎一致</span>
+  </div>
+  <div class="tblwrap">
+    <div class="tbl">
+      <table>
+        <colgroup>
+          <col style="width:10px"><col style="width:34px"><col>
+          <col style="width:48px"><col style="width:48px"><col style="width:48px">
+          <col style="width:228px"><col style="width:118px"><col style="width:60px">
+        </colgroup>
+        <thead><tr>
+          <th></th><th>ID</th><th>属性名称 / 英文标识</th>
+          <th class="num">当前</th><th class="num">最差</th><th class="num">阈值</th>
+          <th class="num">原始值</th><th class="num">RAW (Hex)</th><th>状态</th>
+        </tr></thead>
+        <tbody><tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">01</td><td class="cname">严重警告标志<span class="cen mono">Critical Warning</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0x00</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok sel"><td class="sev" style="padding-left:12px"></td><td class="aid">02</td><td class="cname">综合温度<span class="cen mono">Composite Temperature</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">313 K / 40 ℃</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0139</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">03</td><td class="cname">可用备用空间<span class="cen mono">Available Spare</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">10 %</td><td class="num mono">100 %</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0064</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">04</td><td class="cname">可用备用空间阈值<span class="cen mono">Available Spare Threshold</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">10 %</td><td class="num mono" style="color:var(--t3);font-size:10.5px">000A</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">05</td><td class="cname">已用寿命百分比<span class="cen mono">Percentage Used</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0 %</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0000</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-info"><td class="sev" style="padding-left:12px"></td><td class="aid">06</td><td class="cname">读取单位计数<span class="cen mono">Data Units Read</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">23 507 343 456 单位（12.0 TB）</td><td class="num mono" style="color:var(--t3);font-size:10.5px">FFFFFFFFFFFFFFFF</td><td><span class="tag n">统计</span></td></tr>
+<tr class="s-info"><td class="sev" style="padding-left:12px"></td><td class="aid">07</td><td class="cname">写入单位计数<span class="cen mono">Data Units Written</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">10 764 160 000 单位（5.5 TB）</td><td class="num mono" style="color:var(--t3);font-size:10.5px">FFFFFFFFFFFFFFFF</td><td><span class="tag n">统计</span></td></tr>
+<tr class="s-info"><td class="sev" style="padding-left:12px"></td><td class="aid">08</td><td class="cname">主机读命令计数<span class="cen mono">Host Read Commands</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">187 342 991</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0B2A5C4F</td><td><span class="tag n">统计</span></td></tr>
+<tr class="s-info"><td class="sev" style="padding-left:12px"></td><td class="aid">09</td><td class="cname">主机写命令计数<span class="cen mono">Host Write Commands</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">96 118 402</td><td class="num mono" style="color:var(--t3);font-size:10.5px">05BA9A02</td><td><span class="tag n">统计</span></td></tr>
+<tr class="s-info"><td class="sev" style="padding-left:12px"></td><td class="aid">0A</td><td class="cname">控制器忙状态时间<span class="cen mono">Controller Busy Time</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">1 482 分钟</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0000039A</td><td><span class="tag n">统计</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">0B</td><td class="cname">启动-关闭循环次数<span class="cen mono">Power Cycles</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">1 012 次</td><td class="num mono" style="color:var(--t3);font-size:10.5px">000003F4</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">0C</td><td class="cname">通电时间（小时）<span class="cen mono">Power On Hours</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">207 小时</td><td class="num mono" style="color:var(--t3);font-size:10.5px">000000CF</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">0D</td><td class="cname">不安全关机计数<span class="cen mono">Unsafe Shutdowns</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">3 次</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00000003</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">0E</td><td class="cname">介质与数据完整性错误<span class="cen mono">Media and Data Integrity Errors</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0000000000000000</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">0F</td><td class="cname">错误日志项数<span class="cen mono">Number of Error Log Entries</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00000000</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">10</td><td class="cname">警告综合温度时间<span class="cen mono">Warning Composite Temperature Time</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0 分钟</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00000000</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">11</td><td class="cname">严重综合温度时间<span class="cen mono">Critical Composite Temperature Time</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0 分钟</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00000000</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">12</td><td class="cname">温度传感器 1<span class="cen mono">Temperature Sensor 1</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">40 ℃</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0028</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">13</td><td class="cname">温度传感器 2<span class="cen mono">Temperature Sensor 2</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">41 ℃</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0029</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">14</td><td class="cname">温度传感器 3<span class="cen mono">Temperature Sensor 3</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">39 ℃</td><td class="num mono" style="color:var(--t3);font-size:10.5px">0027</td><td><span class="tag ok">正常</span></td></tr>
+<tr class="s-ok"><td class="sev" style="padding-left:12px"></td><td class="aid">16</td><td class="cname">热管理温度 1 转换次数<span class="cen mono">Thermal Mgmt Temp 1 Transition Count</span></td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">—</td><td class="num mono">0</td><td class="num mono" style="color:var(--t3);font-size:10.5px">00000000</td><td><span class="tag ok">正常</span></td></tr></tbody>
+      </table>
+    </div>
+    <div class="drawer">
+      <div class="dr-h"><span class="dr-id">02</span>
+        <div style="flex:1"><div class="dr-t">综合温度</div><div class="dr-e mono">Composite Temperature</div></div>
+        <span class="tag ok">正常</span></div>
+      <div class="dr-val"><span class="n">40</span><span class="u">℃</span>
+        <span class="sub">RAW 0x0139<br>313 K · 数据单元开尔文</span></div>
+      <div class="dr-sec"><div class="k">含义</div><div class="v">NVMe 控制器上报的综合温度，取所有温度传感器中的代表值。</div></div>
+      <div class="dr-sec"><div class="k">正常范围</div><div class="v">空载 30–45 ℃　高负载 45–70 ℃　持续 &gt; 75 ℃ 触发热降速</div></div>
+      <div class="dr-sec"><div class="k">当前解读</div><div class="v">处于良好区间。本盘另有 2 路传感器（0x13 / 0x14），读数 41 ℃ 与 39 ℃，均低于 45 ℃。</div></div>
+      <div class="dr-sec"><div class="k">历史</div><div class="v">近 30 天最高 55 ℃（2026-09-05 全盘扫描期间），未发生热降速事件。</div></div>
+      <div class="dr-sec"><div class="k">建议</div><div class="v">无需处理。若持续 &gt; 70 ℃，检查散热片贴合与机箱风道。</div></div>
+      <div class="dr-actions"><span class="btn3 p">加入趋势图</span><span class="btn3">复制原始值</span></div>
+    </div>
+  </div>
+</div>
+<div class="dock">
+  <span class="lb2">任务台</span>
+  <div class="task">
+    <span class="nm2">基准测速 · SEQ1M Q8T1</span>
+    <span class="track"><span style="width:68%"></span></span>
+    <span class="pct">68%</span><span class="meta">1.81 GB/s · 剩 00:41</span>
+    <span class="btn2">❙❙</span><span class="btn2">✕</span>
+  </div>
+  <div class="task" style="min-width:296px">
+    <span class="nm2">坏道扫描 · C: 全盘</span>
+    <span class="track"><span style="width:12%;background:var(--warn)"></span></span>
+    <span class="pct" style="color:var(--warn)">12%</span><span class="meta">已暂停 · 剩 02:14:08</span>
+    <span class="btn2">▶</span><span class="btn2">✕</span>
+  </div>
+  <span class="sp"></span>
+  <span class="mono" style="font-size:11.5px;color:var(--t3)">队列 2</span>
+</div>
+</body></html>

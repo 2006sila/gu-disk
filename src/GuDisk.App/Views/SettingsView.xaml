@@ -1,0 +1,270 @@
+<UserControl x:Class="GuDisk.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="外观"/>
+          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Button x:Name="ThemeBtn" Style="{DynamicResource QuietButton}" Content="切换深色 / 浅色"
+                    Click="OnToggleTheme"/>
+            <TextBlock x:Name="ThemeText" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="12"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="偏好"/>
+          <WrapPanel Margin="0,10,0,0">
+            <StackPanel Margin="0,0,20,8">
+              <TextBlock Text="温度单位" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="TempUnitBox" Width="130" Height="30" Margin="0,4,0,0"
+                        SelectionChanged="OnTempUnitChanged">
+                <ComboBoxItem Content="摄氏 ℃" IsSelected="True"/>
+                <ComboBoxItem Content="华氏 ℉"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="0,0,20,8">
+              <TextBlock Text="属性名语言" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <ComboBox x:Name="NameLangBox" Width="130" Height="30" Margin="0,4,0,0"
+                        SelectionChanged="OnNameLangChanged">
+                <ComboBoxItem Content="中文" IsSelected="True"/>
+                <ComboBoxItem Content="English"/>
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Margin="0,0,20,8">
+              <TextBlock Text="自动刷新" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <ComboBox x:Name="AutoRefreshBox" Width="130" Height="30"
+                          SelectionChanged="OnAutoRefreshChanged">
+                  <ComboBoxItem Content="关闭" IsSelected="True"/>
+                  <ComboBoxItem Content="每 5 秒"/><ComboBoxItem Content="每 10 秒"/>
+                  <ComboBoxItem Content="每 30 秒"/><ComboBoxItem Content="每 1 分钟"/>
+                  <ComboBoxItem Content="每 5 分钟"/><ComboBoxItem Content="每 15 分钟"/>
+                  <ComboBoxItem Content="每 30 分钟"/><ComboBoxItem Content="每 1 小时"/>
+                  <ComboBoxItem Content="自定义…"/>
+                </ComboBox>
+                <TextBox x:Name="CustomRefreshBox" Width="70" Height="30" Margin="8,0,0,0"
+                         IsEnabled="False" ToolTip="自定义间隔数值"/>
+                <ComboBox x:Name="CustomUnitBox" Width="80" Height="30" Margin="6,0,0,0" IsEnabled="False">
+                  <ComboBoxItem Content="秒" IsSelected="True"/>
+                  <ComboBoxItem Content="分钟"/>
+                  <ComboBoxItem Content="小时"/>
+                </ComboBox>
+                <Button x:Name="CustomApplyBtn" Style="{DynamicResource QuietButton}" Content="应用"
+                        Margin="6,0,0,0" IsEnabled="False" Click="OnApplyCustomRefresh"/>
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0,0,20,8">
+              <TextBlock Text="温度刷新（独立）" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <ComboBox x:Name="TempRefreshBox" Width="120" Height="30"
+                          SelectionChanged="OnTempRefreshChanged">
+                  <ComboBoxItem Content="每 1 秒"/><ComboBoxItem Content="每 2 秒"/>
+                  <ComboBoxItem Content="每 5 秒"/><ComboBoxItem Content="每 10 秒" IsSelected="True"/>
+                  <ComboBoxItem Content="每 30 秒"/><ComboBoxItem Content="每 60 秒"/>
+                  <ComboBoxItem Content="自定义…"/>
+                </ComboBox>
+                <TextBox x:Name="CustomTempBox" Width="70" Height="30" Margin="8,0,0,0"
+                         IsEnabled="False" ToolTip="自定义温度刷新间隔（秒）"/>
+                <Button x:Name="CustomTempBtn" Style="{DynamicResource QuietButton}" Content="应用"
+                        Margin="6,0,0,0" IsEnabled="False" Click="OnApplyCustomTemp"/>
+              </StackPanel>
+            </StackPanel>
+            <TextBlock x:Name="RefreshHint" Margin="0,4,0,0" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="系统工具"/>
+          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Button x:Name="ElevateBtn" Style="{DynamicResource PrimaryButton}" Content="以管理员身份重启"
+                    Click="OnElevate"/>
+            <Button Style="{DynamicResource QuietButton}" Content="磁盘管理" Margin="8,0,0,0" Click="OnDiskMgmt"/>
+            <Button Style="{DynamicResource QuietButton}" Content="设备管理器" Margin="8,0,0,0" Click="OnDevMgmt"/>
+            <Button x:Name="DbBtn" Style="{DynamicResource QuietButton}" Content="更新驱动特征库" Margin="8,0,0,0"
+                    Click="OnUpdateDb"/>
+          </StackPanel>
+          <TextBlock x:Name="ToolText" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="数据与路径"/>
+          <ItemsControl x:Name="PathList" Margin="0,10,0,0">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,0,0,7">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding Key}" FontSize="12.5"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" FontFamily="{DynamicResource Font.Mono}"
+                             FontSize="12" Foreground="{DynamicResource Brush.Text1}" TextWrapping="Wrap"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <Button Style="{DynamicResource QuietButton}" Content="打开数据目录" Click="OnOpenData"/>
+            <Button Style="{DynamicResource QuietButton}" Content="导入 CrystalDiskInfo 历史" Margin="8,0,0,0"
+                    Click="OnImportCdi"/>
+          </StackPanel>
+          <TextBlock x:Name="ImportText" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="监控与告警"/>
+          <WrapPanel Margin="0,10,0,0">
+            <StackPanel Margin="0,0,18,8">
+              <TextBlock Text="注意阈值（℃）" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <TextBox x:Name="TempWarnBox" Width="90" Height="30" Margin="0,4,0,0"/>
+            </StackPanel>
+            <StackPanel Margin="0,0,18,8">
+              <TextBlock Text="危险阈值（℃）" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <TextBox x:Name="TempCritBox" Width="90" Height="30" Margin="0,4,0,0"/>
+            </StackPanel>
+            <StackPanel Margin="0,0,18,8">
+              <TextBlock Text="通知方式" FontSize="11" Foreground="{DynamicResource Brush.Text3}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,9,0,0">
+                <CheckBox x:Name="SoundBox" Content="提示音" Click="OnSoundChanged"/>
+                <CheckBox x:Name="OverlayBox" Content="桌面温度悬浮窗" Margin="14,0,0,0" Click="OnOverlayChanged"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <TextBlock Text="悬浮窗显示" FontSize="11" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Brush.Text3}"/>
+                <ComboBox x:Name="OverlayCountBox" Width="130" Height="28" Margin="6,0,0,0"
+                          SelectionChanged="OnOverlayCountChanged">
+                  <ComboBoxItem Content="仅当前盘" IsSelected="True"/>
+                  <ComboBoxItem Content="2 块盘"/><ComboBoxItem Content="3 块盘"/>
+                  <ComboBoxItem Content="4 块盘"/><ComboBoxItem Content="全部盘"/>
+                </ComboBox>
+              </StackPanel>
+              <TextBlock Text="或者逐盘勾选（勾了就以勾选为准，与上面的数量无关）" FontSize="11"
+                         Margin="0,10,0,0" Foreground="{DynamicResource Brush.Text3}"/>
+              <ItemsControl x:Name="OverlayDriveList" Margin="0,4,0,0">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <!-- 用 Checked/Unchecked 而不是 Click：Click 只在鼠标/键盘走完整路由时才有，
+                         而 UIA 的 Toggle 模式（无障碍调用、自动化脚本）只改 IsChecked，不触发 Click。 -->
+                    <CheckBox Content="{Binding Label}" IsChecked="{Binding Checked, Mode=TwoWay}"
+                              Margin="0,3,0,0" Foreground="{DynamicResource Brush.Text2}"
+                              Checked="OnOverlayDriveToggled" Unchecked="OnOverlayDriveToggled"/>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock x:Name="OverlayHint" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Brush.Text3}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,22,0,8">
+              <Button Style="{DynamicResource PrimaryButton}" Content="应用阈值" Click="OnApplyThresholds"/>
+            </StackPanel>
+          </WrapPanel>
+          <TextBlock x:Name="AlertRuleText" Margin="0,4,0,0" FontSize="12"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+
+          <Grid Margin="0,14,0,0">
+            <TextBlock x:Name="AlertHistoryHeader" Style="{DynamicResource MicroLabel}" Text="告警历史"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <Button Style="{DynamicResource QuietButton}" Content="刷新" Height="26" Padding="12,0"
+                      Click="OnRefreshHistory"/>
+              <Button Style="{DynamicResource QuietButton}" Content="清空历史" Height="26" Padding="12,0"
+                      Margin="8,0,0,0" Click="OnClearHistory"/>
+            </StackPanel>
+          </Grid>
+          <ItemsControl x:Name="AlertHistoryList" Margin="0,8,0,0">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding When, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                             FontFamily="{DynamicResource Font.Mono}" FontSize="11"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Level}" FontFamily="{DynamicResource Font.Mono}"
+                             FontSize="11" Foreground="{DynamicResource Brush.Text2}"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="12.5"
+                             Foreground="{DynamicResource Brush.Text1}"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}" Margin="0,0,0,12">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="硬盘盒 / USB 桥接 / RAID"/>
+          <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text3}"
+                     Text="很多 USB 硬盘盒不转发 SMART 的 ATA 透传命令。如果自动侦测读不到，在这里强制指定 smartctl 的 -d 参数再重试。"/>
+          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <ComboBox x:Name="BridgeBox" Width="240" Height="32" SelectionChanged="OnBridgeChanged">
+              <ComboBoxItem Content="自动侦测" IsSelected="True"/>
+              <ComboBoxItem Content="sat（标准 SATA 透传）"/>
+              <ComboBoxItem Content="usb（USB 闪存盘，免透传）"/>
+              <ComboBoxItem Content="nvme（NVMe 直连/硬盘盒）"/>
+              <ComboBoxItem Content="sntrealtek（Realtek 双模）"/>
+              <ComboBoxItem Content="sntjmicron（JMicron NVMe）"/>
+              <ComboBoxItem Content="usbjmicron（JMicron SATA）"/>
+              <ComboBoxItem Content="usbasmedia（ASMedia）"/>
+              <ComboBoxItem Content="scsi（SCSI 标准直通）"/>
+              <ComboBoxItem Content="ata（直连 ATA）"/>
+            </ComboBox>
+            <TextBlock x:Name="BridgeText" Margin="14,0,0,0" VerticalAlignment="Center" FontSize="12"
+                       Foreground="{DynamicResource Brush.Text3}"/>
+
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="RAID 控制器模式" Margin="0,18,0,0"/>
+          <TextBlock Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text3}"
+                     Text="RAID 卡后面的成员盘被控制器驱动占住，Windows 根本枚举不到，只能让 smartctl 走控制器私有通道读。指定后对所有盘生效，且优先于上面的硬盘盒模式。"/>
+          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <ComboBox x:Name="RaidBox" Width="280" Height="32" SelectionChanged="OnRaidChanged">
+              <ComboBoxItem Content="自动侦测"/>
+              <ComboBoxItem Content="megaraid,0（LSI MegaRAID 第 0 块）"/>
+              <ComboBoxItem Content="megaraid,1（第 1 块）"/>
+              <ComboBoxItem Content="aacraid,0,0,0（Adaptec）"/>
+              <ComboBoxItem Content="3ware,0（3ware）"/>
+              <ComboBoxItem Content="areca,1（Areca）"/>
+              <ComboBoxItem Content="cciss,0（HP Smart Array）"/>
+              <ComboBoxItem Content="sat+raid（通用 SAT 透传）"/>
+            </ComboBox>
+          </StackPanel>
+          <TextBlock x:Name="RaidHint" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap"
+                     Foreground="{DynamicResource Brush.Text3}"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{DynamicResource ModuleCard}">
+        <StackPanel>
+          <TextBlock Style="{DynamicResource MicroLabel}" Text="关于"/>
+          <ItemsControl x:Name="AboutList" Margin="0,10,0,0">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding Key}" FontSize="12.5"
+                             Foreground="{DynamicResource Brush.Text3}"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" FontFamily="{DynamicResource Font.Mono}"
+                             FontSize="12" Foreground="{DynamicResource Brush.Text1}" TextWrapping="Wrap"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

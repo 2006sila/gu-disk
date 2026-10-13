@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- 浅色令牌 · 键名与深色完全相同，切换只换这一本字典 -->
+  <SolidColorBrush x:Key="Brush.Bg"        Color="#FFF4F5F7"/>
+  <SolidColorBrush x:Key="Brush.Surface"   Color="#FFFFFFFF"/>
+  <SolidColorBrush x:Key="Brush.Surface2"  Color="#FFFAFBFC"/>
+  <SolidColorBrush x:Key="Brush.Surface3"  Color="#FFF1F3F6"/>
+  <SolidColorBrush x:Key="Brush.Line"      Color="#FFE3E6EB"/>
+  <SolidColorBrush x:Key="Brush.Line2"     Color="#FFCBD1D9"/>
+
+  <SolidColorBrush x:Key="Brush.Text1"     Color="#FF10131A"/>
+  <SolidColorBrush x:Key="Brush.Text2"     Color="#FF5A6472"/>
+  <SolidColorBrush x:Key="Brush.Text3"     Color="#FF8A93A0"/>
+
+  <SolidColorBrush x:Key="Brush.Lime"      Color="#FF7C9E12"/>
+  <SolidColorBrush x:Key="Brush.LimeBright" Color="#B4E03A"/>
+  <SolidColorBrush x:Key="Brush.LimeDeep" Color="#8FBF22"/>
+  <SolidColorBrush x:Key="Brush.LimeDim"   Color="#1F7C9E12"/>
+  <SolidColorBrush x:Key="Brush.LimeLine"  Color="#737C9E12"/>
+
+  <SolidColorBrush x:Key="Brush.Ok"        Color="#FF1E9E63"/>
+  <SolidColorBrush x:Key="Brush.OkDim"     Color="#1F1E9E63"/>
+  <SolidColorBrush x:Key="Brush.Warn"      Color="#FFB0780F"/>
+  <SolidColorBrush x:Key="Brush.WarnDim"   Color="#1FB0780F"/>
+  <SolidColorBrush x:Key="Brush.Bad"       Color="#FFD93B33"/>
+  <SolidColorBrush x:Key="Brush.BadDim"    Color="#1FD93B33"/>
+  <SolidColorBrush x:Key="Brush.Blue"      Color="#FF2C7BD4"/>
+</ResourceDictionary>
