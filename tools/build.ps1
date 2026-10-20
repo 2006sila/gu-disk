@@ -7,7 +7,9 @@
 [CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')][string]$Configuration = 'Release',
-    [switch]$Publish
+    [switch]$Publish,
+    # 框架依赖发布：不带 .NET 运行时，产物约 1 MB，但用户需预装 .NET 9 桌面运行时
+    [switch]$FrameworkDependent
 )
 
 $ErrorActionPreference = 'Stop'
@@ -42,13 +44,15 @@ foreach ($p in $projects) {
 }
 
 if ($Publish) {
-    $out = Join-Path $root 'dist\publish'
+    $out = if ($FrameworkDependent) { Join-Path $root 'dist\publish-fd' } else { Join-Path $root 'dist\publish' }
     # 自包含发布：把 .NET 运行时一起打进包，用户解压双击即可运行，不需要预装任何东西。
     # 不用单文件：WPF + 自包含的单文件会在首次运行时把原生库解到 %TEMP%，
     # 既慢又受临时目录策略影响；目录形式没有这个过程，最稳。
-    Write-Host "--> 自包含发布到 $out（体积较大，属预期）" -ForegroundColor DarkCyan
+    $mode = if ($FrameworkDependent) { '框架依赖（需预装 .NET 9 桌面运行时，体积约 1 MB）' } else { '自包含（含运行时，体积较大，属预期）' }
+    Write-Host "--> $mode 发布到 $out" -ForegroundColor DarkCyan
+    $selfContained = if ($FrameworkDependent) { 'false' } else { 'true' }
     & dotnet publish (Join-Path $root 'src\GuDisk.App\GuDisk.App.csproj') `
-        -c Release -r win-x64 --self-contained true `
+        -c Release -r win-x64 --self-contained $selfContained `
         -p:PublishSingleFile=false -p:DebugType=none `
         -o $out -nologo -v:m
     if ($LASTEXITCODE -ne 0) { throw "发布失败 (exit $LASTEXITCODE)" }

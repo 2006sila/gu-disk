@@ -11,8 +11,19 @@ Windows 桌面硬盘全检工具。覆盖 **NVMe SSD / SATA 固态 / 机械盘 /
 
 ## 下载
 
-见 [Releases](../../releases)：`Gu-disk-x.y.z-win-x64.zip`（64.8 MB，自包含，解压双击 `Gu-disk.exe`，免装 .NET）。
+见 [Releases](../../releases)。**两个版本，按需选一个**：
+
+| 文件 | 体积 | 需要什么 |
+|---|---|---|
+| `Gu-disk-x.y.z-win-x64.zip` | **62 MB** | 什么都不用装，解压双击即用（内含 .NET 9 运行时） |
+| `Gu-disk-x.y.z-win-x64-framework.zip` | **0.9 MB** | 需预装 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download/dotnet/9.0) |
+
+两个版本功能**完全相同**，只是运行时打包方式不同。
+62 MB 里约 145 MB（解压后）是 .NET 运行时本身，本项目自己的代码只有约 170 KB。
 内含 SHA256SUMS.txt 供校验。
+
+> 首次使用建议以管理员身份运行（右键 → 以管理员身份运行，或双击仓库里的 `run-gudisk.cmd`）——
+> USB 硬盘盒的 SMART 必须提权才能穿过桥接读取，这是硬件限制，CrystalDiskInfo 同样要求。
 
 ## 功能
 
