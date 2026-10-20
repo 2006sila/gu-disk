@@ -114,7 +114,9 @@ public sealed class SmartReadOrchestrator
                 Model: sc.Parsed.Model, Serial: sc.Parsed.Serial, Firmware: sc.Parsed.Firmware,
                 Standard: sc.Parsed.Nvme is not null ? "NVMe" : "ATA",
                 Interface: drive.IsUsb ? "USB" : (sc.Parsed.Nvme is not null ? "PCIe" : "SATA"),
-                TransferMode: "-", SupportedMode: "-",
+                // 链路速率：USB-SATA 桥接盘从 IDENTIFY word 76 得到（"SATA/600"），
+                // 拿不到就退回 "-"，不编。
+                TransferMode: sc.Parsed.SataSpeed ?? "-", SupportedMode: sc.Parsed.SataSpeed ?? "-",
                 RotationRateRpm: sc.Parsed.RotationRateRpm, PowerOnHours: 0, PowerOnCount: 0,
                 TrimSupported: false, ZonedDevice: false, NcQSupported: false,
                 Capacities: null, FormFactor: "未报告");

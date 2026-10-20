@@ -123,6 +123,10 @@ internal static class Program
         }
 
         Console.WriteLine("   引擎: " + outcome.Engine + "    数据源: " + outcome.Source);
+        // 链路速率（USB-SATA 桥接盘靠 IDENTIFY word 76 才能拿到，与 CrystalDiskInfo 的 "SATA/600" 同口径）
+        if (outcome.Identity is { } idInfo
+            && idInfo.TransferMode.Length > 0 && idInfo.TransferMode != "-")
+            Console.WriteLine("   链路: " + idInfo.TransferMode);
         Console.WriteLine();
         // 与 CrystalDiskInfo 对齐：**当前值 / 最差值 / 临界值** 三列是判断"还剩多少余量"的关键，
         // 以前只打原始值（对应 CDI 的最右一列），信息少了一大截。

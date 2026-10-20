@@ -12,7 +12,12 @@ public sealed record SmartctlParsed(
     string DeviceName, string DeviceType, int ExitStatus,
     IReadOnlyList<string> Messages,
     /// <summary>标称转速（rpm）。smartctl 的 rotation_rate；SSD 为 null。</summary>
-    int? RotationRateRpm = null);
+    int? RotationRateRpm = null,
+    /// <summary>
+    /// 链路速率（如 "SATA/600"）。**USB-SATA 桥接盘只能从 IDENTIFY DEVICE 的 word 76 得到** ——
+    /// smartctl 的 -i 在这种情况下不输出 "SATA Version is"，所以要额外跑一次 --identify。
+    /// </summary>
+    string? SataSpeed = null);
 
 public sealed record SmartctlResult(
     bool Success, string? Error, SmartctlParsed? Parsed, string RawJson,
@@ -54,6 +59,12 @@ public sealed class SmartctlEngine
 
         string type = deviceTypeOverride ?? drive.SmartctlDeviceType ?? "auto";
         string args = "-x -j -d " + type + " " + dev;
+        // USB-SATA 桥接：-i 不给 "SATA Version is"（桥不透传那部分 identify），
+        // 只能额外跑 --identify 读 word 76 的 bit1/2/3（Gen1/2/3 = 1.5/3/6 Gb/s）。
+        string? sataSpeed = null;
+        if (type is "sat" or "usbjmicron" or "usbasmedia" or "usbprolific")
+            sataSpeed = ReadSataSpeed(dev, type);
+
         var (stdout, _, exit) = Run(args);
         if (string.IsNullOrWhiteSpace(stdout))
             return new SmartctlResult(false, "smartctl 无输出（" + dev + "）", null, "");
@@ -61,6 +72,7 @@ public sealed class SmartctlEngine
         try
         {
             var parsed = Parse(stdout, exit);
+            if (parsed is not null && sataSpeed is not null) parsed = parsed with { SataSpeed = sataSpeed };
             return parsed is null
                 ? new SmartctlResult(false, "smartctl JSON 解析失败（" + dev + "）", null, stdout, dev)
                 : new SmartctlResult(true, null, parsed, stdout, dev);
@@ -109,6 +121,27 @@ public sealed class SmartctlEngine
     /// 判定：纯数字且去掉前导零后不足 4 位 → 当假值处理（真序列号总有字母或足够长）。
     /// </summary>
     private static bool LooksFakeSerial(string s) => DiskKey.LooksFakeSerial(s);
+
+    /// <summary>
+    /// 从 IDENTIFY DEVICE 的 word 76 读链路速率。
+    /// 输出形如 "  76      -     0x000e   Serial ATA capabilities"，取那个 0x 值：
+    ///   bit1 = Gen1 (1.5 Gb/s)、bit2 = Gen2 (3 Gb/s)、bit3 = Gen3 (6 Gb/s)。
+    /// 这是"最高支持速率"，与 CrystalDiskInfo 的 "SATA/600" 同一口径。
+    /// </summary>
+    private string? ReadSataSpeed(string dev, string type)
+    {
+        var (text, _, _) = Run("--identify -d " + type + " " + dev);
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        var m = System.Text.RegularExpressions.Regex.Match(text,
+            @"^\s*76\s+-\s+0x([0-9A-Fa-f]{1,4})", System.Text.RegularExpressions.RegexOptions.Multiline);
+        if (!m.Success) return null;
+        if (!ushort.TryParse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber,
+                System.Globalization.CultureInfo.InvariantCulture, out ushort w)) return null;
+        if ((w & 0x0008) != 0) return "SATA/600";
+        if ((w & 0x0004) != 0) return "SATA/300";
+        if ((w & 0x0002) != 0) return "SATA/150";
+        return null;
+    }
 
     /// <summary>
     /// 只读身份（-i -j，不带 -x）。给枚举器补真序列号用 ——
