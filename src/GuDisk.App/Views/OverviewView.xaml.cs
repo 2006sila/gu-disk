@@ -102,9 +102,11 @@ public partial class OverviewView : UserControl
             new("标准", id?.Standard ?? (nvme ? "NVMe" : "-")),
             new("主机读取", n is null ? "-" : UnitConverter.FormatBytes(UnitConverter.NvmeDataUnitsToBytes(n.DataUnitsRead))),
             new("主机写入", n is null ? "-" : UnitConverter.FormatBytes(UnitConverter.NvmeDataUnitsToBytes(n.DataUnitsWritten))),
-            new("通电次数", n is null ? (id?.PowerOnCount.ToString("N0") ?? "-") : UnitConverter.FormatCount((long)n.PowerCycles) + " 次"),
-            new("通电时间", n is null ? "-" : UnitConverter.FormatCount((long)n.PowerOnHours) + " 小时"),
-            new("介质转速", id is null ? (nvme ? "无（固态）" : "-") : id.RotationRateRpm is { } rpm ? rpm + " RPM" : "无（固态）"),
+            new("通电次数", n is not null ? UnitConverter.FormatCount((long)n.PowerCycles) + " 次"
+                : id is { PowerOnCount: > 0 } ? UnitConverter.FormatCount(id.PowerOnCount) + " 次" : "-"),
+            new("通电时间", n is not null ? UnitConverter.FormatCount((long)n.PowerOnHours) + " 小时"
+                : id is { PowerOnHours: > 0 } ? UnitConverter.FormatCount(id.PowerOnHours) + " 小时" : "-"),
+            new("介质转速", MediaSpeedText(id, d.Media)),
             // TRIM 对 ATA 是 DATA SET MANAGEMENT，对 NVMe 是 Dataset Management(Deallocate)，
             // 两者能力位在不同地方。以前对 NVMe 直接写死"支持" —— 那是编的。
             // 现在：ATA 报实读值；NVMe 明说"未读能力位"（诚实 > 好看）。
@@ -197,6 +199,21 @@ public partial class OverviewView : UserControl
 
         // ---------- 快速跳转 ----------
         JumpList.ItemsSource = Jumps.Select(j => new JumpRow(j.Title, j.Desc, j.Tag)).ToList();
+    }
+
+    /// <summary>
+    /// 介质转速的显示文本。
+    ///
+    /// **不能靠"转速为 null"反推固态**：IntelliPower 类机械盘（如 WD20EURS 这类 AV-GP 监控盘）
+    /// 根本不报标称转速，靠转速猜会把机械盘标成"无（固态）"（实测踩中）。
+    /// 正解是看介质判定结果（CmrSmrDetector 用机械盘独有属性算出来的）。
+    /// </summary>
+    private static string MediaSpeedText(IdentityInfo? id, MediaVerdict media)
+    {
+        if (id?.RotationRateRpm is { } rpm && rpm > 0) return rpm + " RPM";
+        if (media.Technology == MediaTechnology.Ssd) return "无（固态）";
+        if (media.Rotational) return "机械盘（转速未报告）";
+        return "-";
     }
 
     /// <summary>

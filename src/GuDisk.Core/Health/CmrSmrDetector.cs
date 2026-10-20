@@ -10,7 +10,14 @@ public sealed record MediaVerdict(
     string Label,
     int ConfidencePercent,
     string Reason,
-    bool TrimSupported);
+    bool TrimSupported,
+    /// <summary>
+    /// 是否旋转介质（机械盘）。**与 CMR/SMR 判定分开** ——
+    /// 有些盘能确定是机械盘（有起转用时等属性）但型号未收录、判不出 CMR/SMR，
+    /// 这时 Technology 只能是 Unknown，但 Rotational 仍为 true。
+    /// 界面不能拿 Technology 当"是不是机械盘"用。
+    /// </summary>
+    bool Rotational = false);
 
 /// <summary>
 /// 介质类型判定：SSD / 机械(CMR) / 机械(SMR)。
@@ -51,36 +58,36 @@ public static class CmrSmrDetector
         // ---- 2) 叠瓦（SMR）判定 ----
         if (identity?.ZonedDevice == true)
             return new MediaVerdict(MediaTechnology.HddSmrZoned, "SMR 叠瓦盘（主机管理型 / ZAC-ZBC）", 100,
-                "硬盘固件声明支持 ZAC/ZBC 分区命令集", trim);
+                "硬盘固件声明支持 ZAC/ZBC 分区命令集", trim, Rotational: true);
 
         var smr = drivedb?.Match(model, smrOnly: true);
         if (smr is not null)
             return new MediaVerdict(MediaTechnology.HddSmr, "SMR 叠瓦盘", 100,
-                "命中 smartmontools drivedb 官方 SMR 标注：" + smr.Family + (trim ? "，且底层声明支持 TRIM" : ""), trim);
+                "命中 smartmontools drivedb 官方 SMR 标注：" + smr.Family + (trim ? "，且底层声明支持 TRIM" : ""), trim, Rotational: true);
 
         var cmr = drivedb?.Match(model, cmrOnly: true);
         if (cmr is not null)
             return new MediaVerdict(MediaTechnology.HddCmr, "CMR 垂直盘", 100,
-                "命中 smartmontools drivedb 官方 CMR 标注：" + cmr.Family, trim);
+                "命中 smartmontools drivedb 官方 CMR 标注：" + cmr.Family, trim, Rotational: true);
 
         // 兜底：旧版内置型号正则（drivedb 没收录的新盘/冷门盘）
         if (LooksLikeSmr(model))
             return new MediaVerdict(MediaTechnology.HddSmr, "SMR 叠瓦盘（疑似）", 85,
-                "命中内置叠瓦型号特征" + (trim ? "；且声明支持 TRIM（消费级 SMR 的典型旁证）" : ""), trim);
+                "命中内置叠瓦型号特征" + (trim ? "；且声明支持 TRIM（消费级 SMR 的典型旁证）" : ""), trim, Rotational: true);
         if (LooksLikeCmr(model))
-            return new MediaVerdict(MediaTechnology.HddCmr, "CMR 垂直盘", 90, "命中内置垂直型号特征", trim);
+            return new MediaVerdict(MediaTechnology.HddCmr, "CMR 垂直盘", 90, "命中内置垂直型号特征", trim, Rotational: true);
 
         if (rpm is not null)
             return new MediaVerdict(MediaTechnology.Unknown, "机械盘（介质类型未收录）", 0,
                 "转速 " + rpm + " rpm，属机械盘；但 drivedb 与内置特征库都未收录该型号，无法判定 CMR/SMR。"
-                + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim);
+                + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim, Rotational: true);
 
         // 转速未报告、但属性表证明是机械盘（IntelliPower / 监控盘常见）
         if (hasMechanicalAttrs)
             return new MediaVerdict(MediaTechnology.Unknown, "机械盘（CMR/SMR 未收录）", 0,
                 "存在起转用时 / 寻道错误率 / 磁头归位等机械盘独有属性，可确定为机械硬盘；"
                 + "但该型号未收录于 drivedb（固件未报告标称转速），无法判定 CMR/SMR。"
-                + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim);
+                + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim, Rotational: true);
 
         return new MediaVerdict(MediaTechnology.Unknown, "未收录，无法判定", 0,
             "缺少足够证据（无 drivedb 标注、无 ZAC/ZBC、无转速信息）", trim);

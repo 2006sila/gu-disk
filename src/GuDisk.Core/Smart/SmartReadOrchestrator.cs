@@ -110,6 +110,15 @@ public sealed class SmartReadOrchestrator
             // **回填真实身份**：USB 桥接盘在 Windows 眼里是"桥接芯片"（Realtek RTL9210B-CG），
             // smartctl 穿过桥读到的是盘自己（KIOXIA EXCERIA PLUS G3）。不回填的话，
             // 界面标题、历史目录名、DiskKey 全都挂在桥上 —— 换个盒子同一块盘就变成"另一块盘"了。
+            // 通电时间(0x09) / 通电次数(0x0C)：ATA 盘只能从 SMART 属性取（NVMe 才有专门的健康日志字段）。
+            // 以前这两个字段在 smartctl 路径上恒为 0，界面于是显示 "0 次" 和 "-"。
+            long poh = 0, poc = 0;
+            foreach (var a in sc.Parsed.AtaAttributes)
+            {
+                if (a.Id == 0x09) poh = (long)a.Raw;
+                if (a.Id == 0x0C) poc = (long)a.Raw;
+            }
+
             var identity = string.IsNullOrWhiteSpace(sc.Parsed.Model) ? null : new IdentityInfo(
                 Model: sc.Parsed.Model, Serial: sc.Parsed.Serial, Firmware: sc.Parsed.Firmware,
                 Standard: sc.Parsed.Nvme is not null ? "NVMe" : "ATA",
@@ -117,7 +126,7 @@ public sealed class SmartReadOrchestrator
                 // 链路速率：USB-SATA 桥接盘从 IDENTIFY word 76 得到（"SATA/600"），
                 // 拿不到就退回 "-"，不编。
                 TransferMode: sc.Parsed.SataSpeed ?? "-", SupportedMode: sc.Parsed.SataSpeed ?? "-",
-                RotationRateRpm: sc.Parsed.RotationRateRpm, PowerOnHours: 0, PowerOnCount: 0,
+                RotationRateRpm: sc.Parsed.RotationRateRpm, PowerOnHours: poh, PowerOnCount: poc,
                 TrimSupported: false, ZonedDevice: false, NcQSupported: false,
                 Capacities: null, FormFactor: "未报告");
 
