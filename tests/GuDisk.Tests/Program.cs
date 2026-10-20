@@ -508,7 +508,7 @@ internal static class Program
         Eq(0x332211L, list[1].Lba, "第二条 LBA 也应取 [5-7]");
         True(!list[1].Uncorrectable, "第二条 bit6 未置位");
 
-        long oldWrong = data[o + 3] | (data[o + 4] << 8) | (data[o + 5] << 16) | ((long)data[o + 6] << 24);
+        long oldWrong = (long)data[o + 3] | ((long)data[o + 4] << 8) | ((long)data[o + 5] << 16) | ((long)data[o + 6] << 24);
         True(oldWrong != list[0].Lba, "旧错位算法必须给出不同结果，否则测不出回归（实际 " + oldWrong + "）");
     }
 

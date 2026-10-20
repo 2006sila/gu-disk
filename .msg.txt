@@ -1,0 +1,14 @@
+机械盘真机修复（0.2.6）
+
+- 设备解析：索引对应 + 序列号验证（原来同序列号时映射互相覆盖，两块盘都指向 /dev/sdd）
+- 桥接类型：JMicron USB-SATA 改用 -d sat（usbjmicron 裸用报 No device connected；补 PID 0xA901）
+- DiskKey：枚举阶段对序列号可疑的 USB 盘补真身份，解决两块同型号盘 Key 冲突
+- 介质判定：改用机械盘独有属性（起转用时/寻道错误率/磁头归位）；
+  修正「无转速 = SSD」的误判隐患（IntelliPower 机械盘也不报转速）
+- smartctl：解析 rotation_rate 并回填 IdentityInfo
+- 属性表：补 当前值/最差/临界 三列（GUI + CLI），与 CrystalDiskInfo 对齐
+- CLI：smart 命令套用属性特征库（原来显示英文名）
+- 测速：创建失败时降级去掉 WRITE_THROUGH 重试；错误信息带实际参数与目录可写性
+- 新增 run-gudisk.cmd：双击以管理员身份启动
+
+与 CrystalDiskInfo 9.7.2 实测对照：型号/固件/序列号/通电时间/18 个属性原始值逐个一致。

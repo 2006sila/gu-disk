@@ -46,11 +46,29 @@ public sealed class DirectIoFile : IDisposable
 
         var h = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, IntPtr.Zero,
             CREATE_ALWAYS, flags, IntPtr.Zero);
+
+        // **降级重试**：FILE_FLAG_WRITE_THROUGH 要求把每次写都穿透到介质，
+        // 部分 USB 桥接固件 / 文件系统过滤驱动会直接拒绝这个打开方式（Win32 5 拒绝访问），
+        // 而同一目录用普通方式完全可写。去掉 WRITE_THROUGH 只损失"写穿透"语义，
+        // 测速仍是 NO_BUFFERING 直接 I/O（那才是测速的关键）。
+        if (h.IsInvalid && (flags & FILE_FLAG_WRITE_THROUGH) != 0)
+        {
+            h = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, IntPtr.Zero,
+                CREATE_ALWAYS, flags & ~FILE_FLAG_WRITE_THROUGH, IntPtr.Zero);
+        }
         if (h.IsInvalid)
         {
             int err = Marshal.GetLastWin32Error();
             string hint = err == 5 ? "（拒绝访问：若在受限环境里运行，目标目录可能不可写）" : "";
-            return (null, "创建测试文件失败（Win32 " + err + "）" + hint + "：" + path);
+            // 把实际传给 CreateFileW 的参数一并带出 —— 只报 "Win32 5" 时无从判断
+            // 是权限、路径、还是标志组合的问题（实测排查 USB 盘测速时卡在这里）。
+            return (null, "创建测试文件失败（Win32 " + err + "）" + hint + "：" + path
+                + " [access=0x" + (GENERIC_READ | GENERIC_WRITE).ToString("X8")
+                + " share=" + FILE_SHARE_READ
+                + " disp=" + CREATE_ALWAYS
+                + " flags=0x" + flags.ToString("X8") + "]"
+                + " 目录可写=" + CanWriteDir(dir)
+                + " 管理员=" + IsAdmin());
         }
 
         // 预分配到目标大小；无缓存 I/O 下首个写入会自动分配簇，读测试前必须先写一遍
@@ -59,6 +77,32 @@ public sealed class DirectIoFile : IDisposable
         SetEndOfFile(h);
 
         return (new DirectIoFile(h, path, length, blockSize, true), null);
+    }
+
+    /// <summary>目录可写性探测（诊断用：区分"目录不可写"与"标志组合被拒"）。</summary>
+    private static string CanWriteDir(string? dir)
+    {
+        if (string.IsNullOrEmpty(dir)) return "?";
+        try
+        {
+            string probe = System.IO.Path.Combine(dir, ".gd_probe_" + Guid.NewGuid().ToString("N")[..6]);
+            using (var fs2 = new FileStream(probe, FileMode.CreateNew, FileAccess.Write, FileShare.None, 1,
+                       FileOptions.DeleteOnClose))
+                fs2.WriteByte(0);
+            return "是";
+        }
+        catch (Exception ex) { return "否(" + ex.GetType().Name + ")"; }
+    }
+
+    private static string IsAdmin()
+    {
+        try
+        {
+            using var id = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var pr = new System.Security.Principal.WindowsPrincipal(id);
+            return pr.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator) ? "是" : "否";
+        }
+        catch { return "?"; }
     }
 
     public static (DirectIoFile? File, string? Error) Open(string path, uint blockSize)

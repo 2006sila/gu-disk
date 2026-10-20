@@ -58,7 +58,19 @@ public sealed record SmartAttribute(
     string RawHex,
     string RawMeaning,
     string Status,     // 正常 / 注意 / 危险 / 统计
-    string Category);  // 坏道 / 寿命 / 环境 / 接口 / 统计
+    string Category)   // 坏道 / 寿命 / 环境 / 接口 / 统计
+{
+    /// <summary>
+    /// 是否有"当前值/最差值/临界值"这套阈值体系。
+    /// ATA 属性有（CDI 的三列就是它）；**NVMe 属性没有** —— 它的这三个字段恒为 0，
+    /// 直接显示 0 会让人误以为"临界值是 0"，所以统一转成 "-"。
+    /// </summary>
+    public bool HasThresholds => Current != 0 || Worst != 0 || Threshold != 0;
+
+    public string CurrentText => HasThresholds ? Current.ToString() : "-";
+    public string WorstText => HasThresholds ? Worst.ToString() : "-";
+    public string ThresholdText => HasThresholds ? Threshold.ToString() : "-";
+}
 
 public sealed record AtaSmartBlock(
     bool SmartPassed,

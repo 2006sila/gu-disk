@@ -40,17 +40,35 @@
                                            Foreground="{DynamicResource Brush.Text3}"/></DataTemplate>
                 </GridViewColumn.CellTemplate>
               </GridViewColumn>
-              <GridViewColumn Header="属性名称" Width="190">
+              <GridViewColumn Header="属性名称" Width="180">
                 <GridViewColumn.CellTemplate>
                   <DataTemplate><TextBlock Text="{Binding Converter={StaticResource AttrName}}" FontWeight="SemiBold"/></DataTemplate>
                 </GridViewColumn.CellTemplate>
               </GridViewColumn>
-              <GridViewColumn Header="原始值（十进制）" Width="250">
+              <GridViewColumn Header="当前" Width="52">
+                <GridViewColumn.CellTemplate>
+                  <DataTemplate><TextBlock Text="{Binding CurrentText}" HorizontalAlignment="Right"
+                                           FontFamily="{DynamicResource Font.Mono}" Foreground="{DynamicResource Brush.Text2}"/></DataTemplate>
+                </GridViewColumn.CellTemplate>
+              </GridViewColumn>
+              <GridViewColumn Header="最差" Width="52">
+                <GridViewColumn.CellTemplate>
+                  <DataTemplate><TextBlock Text="{Binding WorstText}" HorizontalAlignment="Right"
+                                           FontFamily="{DynamicResource Font.Mono}" Foreground="{DynamicResource Brush.Text3}"/></DataTemplate>
+                </GridViewColumn.CellTemplate>
+              </GridViewColumn>
+              <GridViewColumn Header="临界" Width="52">
+                <GridViewColumn.CellTemplate>
+                  <DataTemplate><TextBlock Text="{Binding ThresholdText}" HorizontalAlignment="Right"
+                                           FontFamily="{DynamicResource Font.Mono}" Foreground="{DynamicResource Brush.Text3}"/></DataTemplate>
+                </GridViewColumn.CellTemplate>
+              </GridViewColumn>
+              <GridViewColumn Header="原始值（十进制）" Width="210">
                 <GridViewColumn.CellTemplate>
                   <DataTemplate><TextBlock Text="{Binding Converter={StaticResource AttrValue}}" FontFamily="{DynamicResource Font.Mono}"/></DataTemplate>
                 </GridViewColumn.CellTemplate>
               </GridViewColumn>
-              <GridViewColumn Header="原始值（十六进制）" Width="150">
+              <GridViewColumn Header="原始值（十六进制）" Width="120">
                 <GridViewColumn.CellTemplate>
                   <DataTemplate><TextBlock Text="{Binding RawHex}" FontFamily="{DynamicResource Font.Mono}"
                                            Foreground="{DynamicResource Brush.Text3}" FontSize="11"/></DataTemplate>

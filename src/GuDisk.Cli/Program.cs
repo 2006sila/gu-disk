@@ -84,6 +84,17 @@ internal static class Program
         if (args.Contains("--no-check")) { /* 保留：只跑原生不做交叉校验 */ }
         var outcome = new GuDisk.Core.Smart.SmartReadOrchestrator().Read(d, !args.Contains("--no-check"), protocol);
 
+        // **套用特征库把属性名换成中文** —— 以前 CLI 直接打印编排器的原始结果，
+        // 绕过 DriveDiagnostics 的 ApplyNames，于是机械盘显示的是 smartctl 的英文名
+        // （Raw_Read_Error_Rate），而 GUI 同一条属性是中文。CLI 是诊断工具，必须一致。
+        if (outcome.Nvme is null && outcome.Attributes.Count > 0
+            && GuDisk.Core.Decode.SmartAttributeDb.Load() is { } attrDb)
+        {
+            var attrList = outcome.Attributes.ToList();
+            attrDb.ApplyNames(attrList, d.Model, false);
+            outcome = outcome with { Attributes = attrList };
+        }
+
         if (args.Contains("--json"))
         {
             Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
@@ -113,11 +124,21 @@ internal static class Program
 
         Console.WriteLine("   引擎: " + outcome.Engine + "    数据源: " + outcome.Source);
         Console.WriteLine();
-        Console.WriteLine("ID   属性名称                        原始值                                    RAW(Hex)          状态");
-        Console.WriteLine(new string((char)45, 118));
+        // 与 CrystalDiskInfo 对齐：**当前值 / 最差值 / 临界值** 三列是判断"还剩多少余量"的关键，
+        // 以前只打原始值（对应 CDI 的最右一列），信息少了一大截。
+        // NVMe 属性没有阈值概念（其 Current/Worst/Threshold 恒为 0），显示 "-" 而不是骗人的 0。
+        Console.WriteLine("ID   属性名称                      当前 最差 临界  原始值                                  状态");
+        Console.WriteLine(new string((char)45, 134));
         foreach (var a in outcome.Attributes)
-            Console.WriteLine(string.Format("{0,-4} {1,-30} {2,-40} {3,-16} {4}",
-                a.Id.ToString("X2"), a.NameCn, Trunc(a.RawMeaning, 38), Trunc(a.RawHex, 16), a.Status));
+        {
+            bool hasTh = a.Current != 0 || a.Worst != 0 || a.Threshold != 0;
+            Console.WriteLine(string.Format("{0,-4} {1,-26} {2,4} {3,4} {4,4}  {5,-36} {6}",
+                a.Id.ToString("X2"), a.NameCn,
+                hasTh ? a.Current.ToString() : "-",
+                hasTh ? a.Worst.ToString() : "-",
+                hasTh ? a.Threshold.ToString() : "-",
+                Trunc(a.RawMeaning, 34), a.Status));
+        }
 
         if (probe) PrintAttempts(outcome.Attempts);
 

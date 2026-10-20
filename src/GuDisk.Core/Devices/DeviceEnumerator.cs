@@ -44,6 +44,36 @@ public sealed class DeviceEnumerator
         }
         finally { SetupDiDestroyDeviceInfoList(set); }
 
+        // **给序列号可疑的 USB 盘补真实身份**。
+        //
+        // 为什么必须在枚举阶段做：DiskKey = SHA256(型号|序列号)。USB 桥接器经常不转发真序列号，
+        // Windows 给的是 "000000000203" 这类占位串 —— 两块同型号盘拿到**完全相同**的假值，
+        // DiskKey 也就一模一样，历史目录 / 告警 / 悬浮窗勾选全部串在一起（实测两块 WD20EURS）。
+        // 只对"USB 且序列号看起来是假值"的盘额外跑一次 smartctl -i，普通盘不受影响。
+        var suspicious = result.Where(d => d.IsUsb && DiskKey.LooksFakeSerial(d.Serial)).ToList();
+        if (suspicious.Count > 0)
+        {
+            var engine = new Smart.SmartctlEngine();
+            if (engine.Available)
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var d = result[i];
+                    if (!d.IsUsb || !DiskKey.LooksFakeSerial(d.Serial)) continue;
+                    try
+                    {
+                        if (engine.ReadIdentity(d) is not { } real) continue;
+                        if (DiskKey.LooksFakeSerial(real.Serial)) continue;   // 还是假值，放弃
+                        result[i] = d with
+                        {
+                            Model = real.Model.Length > 0 ? real.Model : d.Model,
+                            Serial = real.Serial,
+                            Firmware = real.Firmware.Length > 0 ? real.Firmware : d.Firmware,
+                        };
+                    }
+                    catch { /* 补不到就保持原样，不影响枚举 */ }
+                }
+        }
+
         return result.OrderBy(d => d.DeviceNumber).ToList();
     }
 

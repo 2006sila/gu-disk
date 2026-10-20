@@ -18,11 +18,15 @@ public static class UsbBridgeDatabase
         // ---- JMicron ----
         new(UsbBridgeKind.JmicronsNvme, "JMicron JMS583 (USB-NVMe)", "sntjmicron", 0x152D, 0x0583),
         new(UsbBridgeKind.JmicronsNvme, "JMicron JMS586/JMS586R (USB-NVMe)", "sntjmicron", 0x152D, 0x0586),
-        new(UsbBridgeKind.JmicronSata, "JMicron JMS578 (USB-SATA)", "usbjmicron", 0x152D, 0x0578),
-        new(UsbBridgeKind.JmicronSata, "JMicron JMS567/JMS561 (USB-SATA)", "usbjmicron", 0x152D, 0x0567),
+        // **JMicron USB-SATA 一律优先 sat**（2026-10-20 实测：WD20EURS + JMS578 双盘位盒）：
+        // "-d usbjmicron" 裸用报 "No device connected"（它要 ,p/,x/,1 之类附加参数），
+        // 而 "-d sat" 直接读到真实序列号（WD-WCAZAJ901513 / WD-WCAZAJ217476）。
+        new(UsbBridgeKind.JmicronSata, "JMicron JMS578 (USB-SATA)", "sat", 0x152D, 0x0578),
+        new(UsbBridgeKind.JmicronSata, "JMicron JMS578/JMS579 双盘位 (USB-SATA)", "sat", 0x152D, 0xA901),
+        new(UsbBridgeKind.JmicronSata, "JMicron JMS567/JMS561 (USB-SATA)", "sat", 0x152D, 0x0567),
         new(UsbBridgeKind.Jmb39x, "JMicron JMB39x 多盘位 (USB-SATA)", "jmb39x", 0x152D, 0x0562),
         new(UsbBridgeKind.Jmb39x, "JMicron JMB39x 多盘位 (USB-SATA)", "jmb39x", 0x152D, 0x0539),
-        new(UsbBridgeKind.JmicronSata, "JMicron 桥接（PID 未收录）", "usbjmicron", 0x152D, null),
+        new(UsbBridgeKind.JmicronSata, "JMicron 桥接（PID 未收录）", "sat", 0x152D, null),
         // ---- ASMedia ----
         new(UsbBridgeKind.AsmediaNvme, "ASMedia ASM2362 (USB-NVMe)", "sntasmedia", 0x174C, 0x2362),
         new(UsbBridgeKind.AsmediaNvme, "ASMedia ASM2364 (USB-NVMe 20Gbps)", "sntasmedia", 0x174C, 0x2364),

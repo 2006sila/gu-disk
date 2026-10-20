@@ -112,9 +112,10 @@ public sealed class SmartReadOrchestrator
             // 界面标题、历史目录名、DiskKey 全都挂在桥上 —— 换个盒子同一块盘就变成"另一块盘"了。
             var identity = string.IsNullOrWhiteSpace(sc.Parsed.Model) ? null : new IdentityInfo(
                 Model: sc.Parsed.Model, Serial: sc.Parsed.Serial, Firmware: sc.Parsed.Firmware,
-                Standard: "NVMe", Interface: drive.IsUsb ? "USB" : "PCIe",
+                Standard: sc.Parsed.Nvme is not null ? "NVMe" : "ATA",
+                Interface: drive.IsUsb ? "USB" : (sc.Parsed.Nvme is not null ? "PCIe" : "SATA"),
                 TransferMode: "-", SupportedMode: "-",
-                RotationRateRpm: null, PowerOnHours: 0, PowerOnCount: 0,
+                RotationRateRpm: sc.Parsed.RotationRateRpm, PowerOnHours: 0, PowerOnCount: 0,
                 TrimSupported: false, ZonedDevice: false, NcQSupported: false,
                 Capacities: null, FormFactor: "未报告");
 

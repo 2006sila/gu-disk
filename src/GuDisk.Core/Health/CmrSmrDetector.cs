@@ -35,7 +35,14 @@ public static class CmrSmrDetector
             return new MediaVerdict(MediaTechnology.Ssd, "SSD（NVMe）", 100,
                 "NVMe 协议设备，必为固态", trim);
 
-        bool ssdByRotation = rpm is null && identity is not null && !identity.ZonedDevice;
+        // **机械盘的独有属性**：起转用时(03) / 启停计数(04) / 寻道错误率(07) / 磁头归位计数(C0)。
+        // SSD 不可能有这几个 SM_A RT 属性 —— 用它们判定机械盘，比"没有转速"可靠得多。
+        // 实测 WD20EURS（AV-GP IntelliPower）就**不报标称转速**，但 03/04/07/C0 齐全。
+        bool hasMechanicalAttrs = ata?.Attributes.Any(a => a.Id is 0x03 or 0x04 or 0x07 or 0xC0) ?? false;
+
+        // "没有转速"**不能**单独当 SSD 的证据：IntelliPower 类机械盘也不报转速。
+        // 必须再排除机械盘独有属性，否则会误判（西数机械盘常带 F1/F2 属性，正好命中下面的擦除计数）。
+        bool ssdByRotation = rpm is null && identity is not null && !identity.ZonedDevice && !hasMechanicalAttrs;
         bool hasEraseAttr = ata?.Attributes.Any(a => a.Id is 0xAD or 0xAB or 0xA9 or 0xE7 or 0xE8) ?? false;
         if (hasEraseAttr || (ssdByRotation && ata?.Attributes.Any(a => a.Id == 0xF1 || a.Id == 0xF2) == true))
             return new MediaVerdict(MediaTechnology.Ssd, "SSD（SATA）", 95,
@@ -66,6 +73,13 @@ public static class CmrSmrDetector
         if (rpm is not null)
             return new MediaVerdict(MediaTechnology.Unknown, "机械盘（介质类型未收录）", 0,
                 "转速 " + rpm + " rpm，属机械盘；但 drivedb 与内置特征库都未收录该型号，无法判定 CMR/SMR。"
+                + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim);
+
+        // 转速未报告、但属性表证明是机械盘（IntelliPower / 监控盘常见）
+        if (hasMechanicalAttrs)
+            return new MediaVerdict(MediaTechnology.Unknown, "机械盘（CMR/SMR 未收录）", 0,
+                "存在起转用时 / 寻道错误率 / 磁头归位等机械盘独有属性，可确定为机械硬盘；"
+                + "但该型号未收录于 drivedb（固件未报告标称转速），无法判定 CMR/SMR。"
                 + "可用全盘顺序读写曲线观察是否出现 SMR 掉速阶梯。", trim);
 
         return new MediaVerdict(MediaTechnology.Unknown, "未收录，无法判定", 0,

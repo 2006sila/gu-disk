@@ -10,7 +10,9 @@ public sealed record SmartctlParsed(
     NvmeSmartLog? Nvme,
     IReadOnlyList<SmartAttribute> AtaAttributes,
     string DeviceName, string DeviceType, int ExitStatus,
-    IReadOnlyList<string> Messages);
+    IReadOnlyList<string> Messages,
+    /// <summary>标称转速（rpm）。smartctl 的 rotation_rate；SSD 为 null。</summary>
+    int? RotationRateRpm = null);
 
 public sealed record SmartctlResult(
     bool Success, string? Error, SmartctlParsed? Parsed, string RawJson,
@@ -29,7 +31,6 @@ public sealed record SmartctlResult(
 public sealed class SmartctlEngine
 {
     private readonly string _exe;
-    private Dictionary<string, string>? _serialToDevice;   // serial(大写) → /dev/sdX
     private List<(string Name, string Type)>? _scanCache;  // --scan 结果（含 -d 类型）
 
     public SmartctlEngine(string? smartctlExe = null)
@@ -99,46 +100,83 @@ public sealed class SmartctlEngine
         return _scanCache;
     }
 
-    /// <summary>定位 /dev/sdX。三级策略，命中即返回。</summary>
+    /// <summary>
+    /// 序列号是否"看起来是假值"。
+    ///
+    /// 为什么需要：USB 桥接器经常不转发真实的 UNIT SERIAL NUMBER，Windows 那边拿到的是
+    /// 形如 "000000000203" 的占位串。两块同型号盘会拿到**完全相同的假序列号**，
+    /// 于是 (型号|序列号) 算出的 DiskKey 也一模一样 —— 历史、告警、悬浮窗勾选全部串在一起。
+    /// 判定：纯数字且去掉前导零后不足 4 位 → 当假值处理（真序列号总有字母或足够长）。
+    /// </summary>
+    private static bool LooksFakeSerial(string s) => DiskKey.LooksFakeSerial(s);
+
+    /// <summary>
+    /// 只读身份（-i -j，不带 -x）。给枚举器补真序列号用 ——
+    /// 比完整 Read 快一半以上，且不需要属性表。
+    /// 失败返回 null（不影响枚举本身）。
+    /// </summary>
+    public (string Model, string Serial, string Firmware)? ReadIdentity(PhysicalDriveInfo drive)
+    {
+        string? dev = ResolveDevice(drive);
+        if (dev is null) return null;
+        var (info, _, _) = Run("-i -j -d " + (drive.SmartctlDeviceType ?? "auto") + " " + dev);
+        if (string.IsNullOrWhiteSpace(info)) return null;
+        string model = ExtractString(info, "model_name");
+        string serial = ExtractString(info, "serial_number");
+        if (model.Length == 0 && serial.Length == 0) return null;
+        return (model, serial, ExtractString(info, "firmware_version"));
+    }
+
+    /// <summary>
+    /// 定位 /dev/sdX。
+    ///
+    /// 策略（2026-10-20 接真实双盘位 JMicron 盒后重写）：
+    ///  ① **索引对应**：Windows 下 smartctl --scan 的顺序与 PhysicalDriveN 一致，
+    ///     这是最可靠的锚点（旧实现只靠序列号，而序列号可能是假的/重复的，冲突时字典互相覆盖，
+    ///     结果 PhysicalDrive2 和 3 都解析到 /dev/sdd）；
+    ///  ② **序列号验证**：用目标盘自己的 -d 类型（如 sat）读一次，能读到真序列号且匹配就确认；
+    ///  ③ 索引对不上（有盘被跳过）时，遍历所有设备找序列号匹配的。
+    /// </summary>
     private string? ResolveDevice(PhysicalDriveInfo drive)
     {
         var devices = Scan();
         if (devices.Count == 0) return null;
 
-        // ① 序列号精确匹配（首选）。读序列号时**必须带上 --scan 给的类型**
-        if (_serialToDevice is null)
+        string wanted = drive.SmartctlDeviceType ?? "auto";
+        string ReadSerial(string dev, string type)
         {
-            _serialToDevice = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var (name, type) in devices)
+            var (info, _, _) = Run("-i -j -d " + type + " " + dev);
+            return ExtractString(info, "serial_number");
+        }
+
+        // ---- ① 索引对应 + 序列号验证 ----
+        if (drive.DeviceNumber >= 0 && drive.DeviceNumber < devices.Count)
+        {
+            string byIndex = devices[drive.DeviceNumber].Name;
+            // 用目标盘的类型读（sat 能读到真序列号；--scan 给的 scsi 只给假值）
+            string atIndex = ReadSerial(byIndex, wanted);
+            if (atIndex.Length > 0 && atIndex.Equals(drive.Serial, StringComparison.OrdinalIgnoreCase))
+                return byIndex;                       // 序列号确认，索引正确
+            if (LooksFakeSerial(atIndex))
+                return byIndex;                       // 序列号本身是假值 → 只能信索引
+            // 读到真序列号但不匹配 → 索引错位，落到 ③ 遍历
+        }
+
+        // ---- ② 遍历找序列号匹配的（索引不可用 / 错位时）----
+        if (!LooksFakeSerial(drive.Serial))
+        {
+            foreach (var (name, _) in devices)
             {
-                var (info, _, _) = Run("-i -j -d " + type + " " + name);
-                string serial = ExtractString(info, "serial_number");
-                if (serial.Length > 0) _serialToDevice[serial] = name;
+                string sn = ReadSerial(name, wanted);
+                if (sn.Length > 0 && sn.Equals(drive.Serial, StringComparison.OrdinalIgnoreCase))
+                    return name;
             }
         }
-        if (_serialToDevice.TryGetValue(drive.Serial, out var hit)) return hit;
 
-        // ② 按 smartctl 认出的 -d 类型匹配 —— 这一路专门为 USB 硬盘盒而加。
-        //    Windows 报的是桥接芯片的序列号，smartctl 读的是盘自己的，两者天生不同，
-        //    所以序列号匹配对硬盘盒永远不会命中。
-        //    **只在同类型设备恰好唯一时才敢用**（本机两块 NVMe 就都是 nvme，会走到 ③）。
-        string want = drive.SmartctlDeviceType ?? "";
-        if (want.Length > 0 && !want.Equals("auto", StringComparison.OrdinalIgnoreCase))
-        {
-            var same = new List<string>();
-            foreach (var (name, type) in devices)
-                if (type.Equals(want, StringComparison.OrdinalIgnoreCase)) same.Add(name);
-            if (same.Count == 1) return same[0];
-        }
-
-        // ③ 兜底：按设备号猜 /dev/sd{字母}（只在枚举顺序恰好一致时成立，且必须序列号对得上）
-        char letter = (char)('a' + Math.Clamp(drive.DeviceNumber, 0, 25));
-        string guess = "/dev/sd" + letter;
-        var (probe, _, _) = Run("-i -j " + guess);
-        string probedSerial = ExtractString(probe, "serial_number");
-        if (probedSerial.Length > 0 && probedSerial.Equals(drive.Serial, StringComparison.OrdinalIgnoreCase))
-            return guess;
-        return null;
+        // ---- ③ 按 --scan 的原始顺序兜底 ----
+        return drive.DeviceNumber >= 0 && drive.DeviceNumber < devices.Count
+            ? devices[drive.DeviceNumber].Name
+            : null;
     }
 
     private static string ExtractString(string json, string key)
@@ -217,7 +255,13 @@ public sealed class SmartctlEngine
             foreach (var row in table.EnumerateArray())
                 ata.Add(FromSmartctlAta(row));
 
-        return new SmartctlParsed(model, serial, firmware, passed, passedKnown, nvme, ata, devName, devType, exitStatus, messages);
+        // 转速：smartctl 顶层 rotation_rate（机械盘才有）。**以前完全没解析** ——
+        // 结果 USB 桥接的机械盘在介质判定里显示"无转速信息"，置信度 0%。
+        int? rpm = null;
+        if (root.TryGetProperty("rotation_rate", out var rr) && rr.ValueKind == JsonValueKind.Number
+            && rr.TryGetInt32(out int rv) && rv > 0) rpm = rv;
+
+        return new SmartctlParsed(model, serial, firmware, passed, passedKnown, nvme, ata, devName, devType, exitStatus, messages, rpm);
     }
 
     private static SmartAttribute FromSmartctlAta(JsonElement row)
